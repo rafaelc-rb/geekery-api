@@ -32,8 +32,8 @@ func (h *AuthHandler) Register(c *gin.Context) {
 	ctx := c.Request.Context()
 
 	var req dto.RegisterRequest
-	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+	if err := validateAndBind(c, &req); err != nil {
+		respondValidationError(c, err)
 		return
 	}
 
@@ -42,13 +42,13 @@ func (h *AuthHandler) Register(c *gin.Context) {
 	if err != nil {
 		switch err {
 		case services.ErrEmailAlreadyExists:
-			c.JSON(http.StatusConflict, gin.H{"error": "email already exists"})
+			respondError(c, http.StatusConflict, dto.ErrCodeUserExists, "email already exists")
 		case services.ErrUsernameAlreadyExists:
-			c.JSON(http.StatusConflict, gin.H{"error": "username already exists"})
+			respondError(c, http.StatusConflict, dto.ErrCodeUserExists, "username already exists")
 		case services.ErrPasswordTooShort:
-			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			respondError(c, http.StatusBadRequest, dto.ErrCodeValidation, err.Error())
 		default:
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to register user"})
+			respondInternalError(c, err)
 		}
 		return
 	}
@@ -57,7 +57,7 @@ func (h *AuthHandler) Register(c *gin.Context) {
 	token, _, err := h.authService.Login(ctx, req.Email, req.Password)
 	if err != nil {
 		// Se falhar o login, ainda retornar sucesso no registro
-		c.JSON(http.StatusCreated, gin.H{
+		respondSuccess(c, http.StatusCreated, gin.H{
 			"message": "user registered successfully, please login",
 			"user": dto.UserInfo{
 				ID:        user.ID,
@@ -82,7 +82,7 @@ func (h *AuthHandler) Register(c *gin.Context) {
 		},
 	}
 
-	c.JSON(http.StatusCreated, response)
+	respondSuccess(c, http.StatusCreated, response)
 }
 
 // Login autentica um usuário
@@ -100,8 +100,8 @@ func (h *AuthHandler) Login(c *gin.Context) {
 	ctx := c.Request.Context()
 
 	var req dto.LoginRequest
-	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+	if err := validateAndBind(c, &req); err != nil {
+		respondValidationError(c, err)
 		return
 	}
 
@@ -109,10 +109,10 @@ func (h *AuthHandler) Login(c *gin.Context) {
 	token, user, err := h.authService.Login(ctx, req.Username, req.Password)
 	if err != nil {
 		if err == services.ErrInvalidCredentials {
-			c.JSON(http.StatusUnauthorized, gin.H{"error": "invalid username/email or password"})
+			respondError(c, http.StatusUnauthorized, dto.ErrCodeInvalidCredentials, "invalid username/email or password")
 			return
 		}
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to login"})
+		respondInternalError(c, err)
 		return
 	}
 
@@ -128,5 +128,5 @@ func (h *AuthHandler) Login(c *gin.Context) {
 		},
 	}
 
-	c.JSON(http.StatusOK, response)
+	respondSuccess(c, http.StatusOK, response)
 }

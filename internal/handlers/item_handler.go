@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"net/http"
-	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"github.com/rafaelc-rb/geekery-api/internal/dto"
@@ -38,7 +37,7 @@ func (h *ItemHandler) GetAllItems(c *gin.Context) {
 	// Parse parâmetros de paginação
 	var params dto.PaginationParams
 	if err := c.ShouldBindQuery(&params); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid pagination parameters"})
+		respondValidationError(c, err)
 		return
 	}
 	params.Normalize()
@@ -54,20 +53,20 @@ func (h *ItemHandler) GetAllItems(c *gin.Context) {
 		mediaType := models.MediaType(typeParam)
 		items, total, err = h.service.GetItemsByType(ctx, mediaType, params)
 		if err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			respondError(c, http.StatusBadRequest, dto.ErrCodeValidation, err.Error())
 			return
 		}
 	} else {
 		items, total, err = h.service.GetAllItems(ctx, params)
 		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			respondInternalError(c, err)
 			return
 		}
 	}
 
 	// Retornar resposta paginada
 	response := dto.NewPaginatedResponse(items, params.Page, params.Limit, total)
-	c.JSON(http.StatusOK, response)
+	respondSuccess(c, http.StatusOK, response)
 }
 
 // GetItemByID retorna um item específico do catálogo
@@ -84,19 +83,19 @@ func (h *ItemHandler) GetAllItems(c *gin.Context) {
 func (h *ItemHandler) GetItemByID(c *gin.Context) {
 	ctx := c.Request.Context()
 
-	id, err := strconv.ParseUint(c.Param("id"), 10, 64)
+	id, err := validateID(c, "id")
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid item ID"})
+		respondError(c, http.StatusBadRequest, dto.ErrCodeInvalidID, err.Error())
 		return
 	}
 
-	item, err := h.service.GetItemByID(ctx, uint(id))
+	item, err := h.service.GetItemByID(ctx, id)
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+		respondNotFound(c, "Item")
 		return
 	}
 
-	c.JSON(http.StatusOK, item)
+	respondSuccess(c, http.StatusOK, item)
 }
 
 // SearchItems busca items por título com paginação
@@ -118,20 +117,20 @@ func (h *ItemHandler) SearchItems(c *gin.Context) {
 	// Parse parâmetros de paginação
 	var params dto.PaginationParams
 	if err := c.ShouldBindQuery(&params); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid pagination parameters"})
+		respondValidationError(c, err)
 		return
 	}
 	params.Normalize()
 
 	items, total, err := h.service.SearchItems(ctx, query, params)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		respondInternalError(c, err)
 		return
 	}
 
 	// Retornar resposta paginada
 	response := dto.NewPaginatedResponse(items, params.Page, params.Limit, total)
-	c.JSON(http.StatusOK, response)
+	respondSuccess(c, http.StatusOK, response)
 }
 
 // CreateItem cria um novo item no catálogo (admin apenas - futuro)
@@ -152,17 +151,17 @@ func (h *ItemHandler) CreateItem(c *gin.Context) {
 		TagIDs []uint `json:"tag_ids"`
 	}
 
-	if err := c.ShouldBindJSON(&input); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+	if err := validateAndBind(c, &input); err != nil {
+		respondValidationError(c, err)
 		return
 	}
 
 	if err := h.service.CreateItem(ctx, &input.Item, input.TagIDs); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		respondError(c, http.StatusBadRequest, dto.ErrCodeValidation, err.Error())
 		return
 	}
 
-	c.JSON(http.StatusCreated, input.Item)
+	respondSuccess(c, http.StatusCreated, input.Item)
 }
 
 // UpdateItem atualiza um item do catálogo (admin apenas - futuro)
@@ -180,9 +179,9 @@ func (h *ItemHandler) CreateItem(c *gin.Context) {
 func (h *ItemHandler) UpdateItem(c *gin.Context) {
 	ctx := c.Request.Context()
 
-	id, err := strconv.ParseUint(c.Param("id"), 10, 64)
+	id, err := validateID(c, "id")
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid item ID"})
+		respondError(c, http.StatusBadRequest, dto.ErrCodeInvalidID, err.Error())
 		return
 	}
 
@@ -191,17 +190,17 @@ func (h *ItemHandler) UpdateItem(c *gin.Context) {
 		TagIDs []uint `json:"tag_ids"`
 	}
 
-	if err := c.ShouldBindJSON(&input); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+	if err := validateAndBind(c, &input); err != nil {
+		respondValidationError(c, err)
 		return
 	}
 
-	if err := h.service.UpdateItem(ctx, uint(id), &input.Item, input.TagIDs); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+	if err := h.service.UpdateItem(ctx, id, &input.Item, input.TagIDs); err != nil {
+		respondError(c, http.StatusBadRequest, dto.ErrCodeValidation, err.Error())
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"message": "item updated successfully"})
+	respondSuccess(c, http.StatusOK, gin.H{"message": "item updated successfully"})
 }
 
 // DeleteItem remove um item do catálogo (admin apenas - futuro)
@@ -218,14 +217,14 @@ func (h *ItemHandler) UpdateItem(c *gin.Context) {
 func (h *ItemHandler) DeleteItem(c *gin.Context) {
 	ctx := c.Request.Context()
 
-	id, err := strconv.ParseUint(c.Param("id"), 10, 64)
+	id, err := validateID(c, "id")
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid item ID"})
+		respondError(c, http.StatusBadRequest, dto.ErrCodeInvalidID, err.Error())
 		return
 	}
 
-	if err := h.service.DeleteItem(ctx, uint(id)); err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+	if err := h.service.DeleteItem(ctx, id); err != nil {
+		respondNotFound(c, "Item")
 		return
 	}
 

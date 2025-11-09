@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"net/http"
-	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"github.com/rafaelc-rb/geekery-api/internal/dto"
@@ -48,8 +47,8 @@ func (h *UserItemHandler) AddToList(c *gin.Context) {
 		Status models.MediaStatus `json:"status"`
 	}
 
-	if err := c.ShouldBindJSON(&input); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+	if err := validateAndBind(c, &input); err != nil {
+		respondValidationError(c, err)
 		return
 	}
 
@@ -61,14 +60,14 @@ func (h *UserItemHandler) AddToList(c *gin.Context) {
 	userItem, err := h.service.AddToList(ctx, userID, input.ItemID, input.Status)
 	if err != nil {
 		if err == models.ErrDuplicateEntry {
-			c.JSON(http.StatusConflict, gin.H{"error": "item already in your list"})
+			respondDuplicate(c, "Item")
 			return
 		}
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		respondError(c, http.StatusBadRequest, dto.ErrCodeValidation, err.Error())
 		return
 	}
 
-	c.JSON(http.StatusCreated, userItem)
+	respondSuccess(c, http.StatusCreated, userItem)
 }
 
 // GetMyList retorna a lista completa do usuário com paginação
@@ -92,7 +91,7 @@ func (h *UserItemHandler) GetMyList(c *gin.Context) {
 	// Parse parâmetros de paginação
 	var params dto.PaginationParams
 	if err := c.ShouldBindQuery(&params); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid pagination parameters"})
+		respondValidationError(c, err)
 		return
 	}
 	params.Normalize()
@@ -109,11 +108,11 @@ func (h *UserItemHandler) GetMyList(c *gin.Context) {
 	if favoriteParam == "true" {
 		userItems, total, err = h.service.GetMyFavorites(ctx, userID, params)
 		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			respondInternalError(c, err)
 			return
 		}
 		response := dto.NewPaginatedResponse(userItems, params.Page, params.Limit, total)
-		c.JSON(http.StatusOK, response)
+		respondSuccess(c, http.StatusOK, response)
 		return
 	}
 
@@ -122,23 +121,23 @@ func (h *UserItemHandler) GetMyList(c *gin.Context) {
 		status := models.MediaStatus(statusParam)
 		userItems, total, err = h.service.GetMyListByStatus(ctx, userID, status, params)
 		if err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			respondError(c, http.StatusBadRequest, dto.ErrCodeValidation, err.Error())
 			return
 		}
 		response := dto.NewPaginatedResponse(userItems, params.Page, params.Limit, total)
-		c.JSON(http.StatusOK, response)
+		respondSuccess(c, http.StatusOK, response)
 		return
 	}
 
 	// Retornar lista completa
 	userItems, total, err = h.service.GetMyList(ctx, userID, params)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		respondInternalError(c, err)
 		return
 	}
 
 	response := dto.NewPaginatedResponse(userItems, params.Page, params.Limit, total)
-	c.JSON(http.StatusOK, response)
+	respondSuccess(c, http.StatusOK, response)
 }
 
 // GetMyListItem retorna um item específico da lista do usuário
@@ -156,19 +155,19 @@ func (h *UserItemHandler) GetMyListItem(c *gin.Context) {
 	ctx := c.Request.Context()
 	userID := getUserID(c)
 
-	id, err := strconv.ParseUint(c.Param("id"), 10, 64)
+	id, err := validateID(c, "id")
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid ID"})
+		respondError(c, http.StatusBadRequest, dto.ErrCodeInvalidID, err.Error())
 		return
 	}
 
-	userItem, err := h.service.GetMyListItem(ctx, uint(id), userID)
+	userItem, err := h.service.GetMyListItem(ctx, id, userID)
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+		respondNotFound(c, "User item")
 		return
 	}
 
-	c.JSON(http.StatusOK, userItem)
+	respondSuccess(c, http.StatusOK, userItem)
 }
 
 // UpdateListItem atualiza um item da lista do usuário
@@ -187,9 +186,9 @@ func (h *UserItemHandler) UpdateListItem(c *gin.Context) {
 	ctx := c.Request.Context()
 	userID := getUserID(c)
 
-	id, err := strconv.ParseUint(c.Param("id"), 10, 64)
+	id, err := validateID(c, "id")
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid ID"})
+		respondError(c, http.StatusBadRequest, dto.ErrCodeInvalidID, err.Error())
 		return
 	}
 
@@ -203,8 +202,8 @@ func (h *UserItemHandler) UpdateListItem(c *gin.Context) {
 		CompletionCount int                 `json:"completion_count"`
 	}
 
-	if err := c.ShouldBindJSON(&input); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+	if err := validateAndBind(c, &input); err != nil {
+		respondValidationError(c, err)
 		return
 	}
 
@@ -218,13 +217,13 @@ func (h *UserItemHandler) UpdateListItem(c *gin.Context) {
 		CompletionCount: input.CompletionCount,
 	}
 
-	userItem, err := h.service.UpdateListItem(ctx, uint(id), userID, updates)
+	userItem, err := h.service.UpdateListItem(ctx, id, userID, updates)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		respondError(c, http.StatusBadRequest, dto.ErrCodeValidation, err.Error())
 		return
 	}
 
-	c.JSON(http.StatusOK, userItem)
+	respondSuccess(c, http.StatusOK, userItem)
 }
 
 // RemoveFromList remove um item da lista do usuário
@@ -242,14 +241,14 @@ func (h *UserItemHandler) RemoveFromList(c *gin.Context) {
 	ctx := c.Request.Context()
 	userID := getUserID(c)
 
-	id, err := strconv.ParseUint(c.Param("id"), 10, 64)
+	id, err := validateID(c, "id")
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid ID"})
+		respondError(c, http.StatusBadRequest, dto.ErrCodeInvalidID, err.Error())
 		return
 	}
 
-	if err := h.service.RemoveFromList(ctx, uint(id), userID); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+	if err := h.service.RemoveFromList(ctx, id, userID); err != nil {
+		respondError(c, http.StatusBadRequest, dto.ErrCodeValidation, err.Error())
 		return
 	}
 
@@ -271,9 +270,9 @@ func (h *UserItemHandler) GetStatistics(c *gin.Context) {
 
 	stats, err := h.service.GetStatistics(ctx, userID)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		respondInternalError(c, err)
 		return
 	}
 
-	c.JSON(http.StatusOK, stats)
+	respondSuccess(c, http.StatusOK, stats)
 }

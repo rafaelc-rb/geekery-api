@@ -2,9 +2,9 @@ package handlers
 
 import (
 	"net/http"
-	"strconv"
 
 	"github.com/gin-gonic/gin"
+	"github.com/rafaelc-rb/geekery-api/internal/dto"
 	"github.com/rafaelc-rb/geekery-api/internal/models"
 	"github.com/rafaelc-rb/geekery-api/internal/services"
 	"gorm.io/gorm"
@@ -46,8 +46,8 @@ func (h *TagHandler) CreateTag(c *gin.Context) {
 	ctx := c.Request.Context()
 
 	var req CreateTagRequest
-	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+	if err := validateAndBind(c, &req); err != nil {
+		respondValidationError(c, err)
 		return
 	}
 
@@ -56,11 +56,11 @@ func (h *TagHandler) CreateTag(c *gin.Context) {
 	}
 
 	if err := h.tagService.CreateTag(ctx, tag); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		respondError(c, http.StatusBadRequest, dto.ErrCodeValidation, err.Error())
 		return
 	}
 
-	c.JSON(http.StatusCreated, tag)
+	respondSuccess(c, http.StatusCreated, tag)
 }
 
 // GetAllTags retorna todas as tags
@@ -77,11 +77,11 @@ func (h *TagHandler) GetAllTags(c *gin.Context) {
 
 	tags, err := h.tagService.GetAllTags(ctx)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve tags"})
+		respondInternalError(c, err)
 		return
 	}
 
-	c.JSON(http.StatusOK, tags)
+	respondSuccess(c, http.StatusOK, tags)
 }
 
 // GetTagByID retorna uma tag específica
@@ -98,23 +98,23 @@ func (h *TagHandler) GetAllTags(c *gin.Context) {
 func (h *TagHandler) GetTagByID(c *gin.Context) {
 	ctx := c.Request.Context()
 
-	id, err := strconv.ParseUint(c.Param("id"), 10, 32)
+	id, err := validateID(c, "id")
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid tag ID"})
+		respondError(c, http.StatusBadRequest, dto.ErrCodeInvalidID, err.Error())
 		return
 	}
 
-	tag, err := h.tagService.GetTagByID(ctx, uint(id))
+	tag, err := h.tagService.GetTagByID(ctx, id)
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
-			c.JSON(http.StatusNotFound, gin.H{"error": "Tag not found"})
+			respondNotFound(c, "Tag")
 			return
 		}
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve tag"})
+		respondInternalError(c, err)
 		return
 	}
 
-	c.JSON(http.StatusOK, tag)
+	respondSuccess(c, http.StatusOK, tag)
 }
 
 // UpdateTag atualiza uma tag existente
@@ -132,15 +132,15 @@ func (h *TagHandler) GetTagByID(c *gin.Context) {
 func (h *TagHandler) UpdateTag(c *gin.Context) {
 	ctx := c.Request.Context()
 
-	id, err := strconv.ParseUint(c.Param("id"), 10, 32)
+	id, err := validateID(c, "id")
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid tag ID"})
+		respondError(c, http.StatusBadRequest, dto.ErrCodeInvalidID, err.Error())
 		return
 	}
 
 	var req UpdateTagRequest
-	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+	if err := validateAndBind(c, &req); err != nil {
+		respondValidationError(c, err)
 		return
 	}
 
@@ -148,19 +148,19 @@ func (h *TagHandler) UpdateTag(c *gin.Context) {
 		Name: req.Name,
 	}
 
-	if err := h.tagService.UpdateTag(ctx, uint(id), tag); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+	if err := h.tagService.UpdateTag(ctx, id, tag); err != nil {
+		respondError(c, http.StatusBadRequest, dto.ErrCodeValidation, err.Error())
 		return
 	}
 
 	// Buscar a tag atualizada
-	updatedTag, err := h.tagService.GetTagByID(ctx, uint(id))
+	updatedTag, err := h.tagService.GetTagByID(ctx, id)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve updated tag"})
+		respondInternalError(c, err)
 		return
 	}
 
-	c.JSON(http.StatusOK, updatedTag)
+	respondSuccess(c, http.StatusOK, updatedTag)
 }
 
 // DeleteTag remove uma tag
@@ -177,16 +177,16 @@ func (h *TagHandler) UpdateTag(c *gin.Context) {
 func (h *TagHandler) DeleteTag(c *gin.Context) {
 	ctx := c.Request.Context()
 
-	id, err := strconv.ParseUint(c.Param("id"), 10, 32)
+	id, err := validateID(c, "id")
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid tag ID"})
+		respondError(c, http.StatusBadRequest, dto.ErrCodeInvalidID, err.Error())
 		return
 	}
 
-	if err := h.tagService.DeleteTag(ctx, uint(id)); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+	if err := h.tagService.DeleteTag(ctx, id); err != nil {
+		respondError(c, http.StatusBadRequest, dto.ErrCodeValidation, err.Error())
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"message": "Tag deleted successfully"})
+	respondSuccess(c, http.StatusOK, gin.H{"message": "Tag deleted successfully"})
 }

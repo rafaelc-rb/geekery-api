@@ -253,3 +253,41 @@ func TestItemHandler_SearchItems_MissingQuery(t *testing.T) {
 		t.Errorf("Expected status 200, got %d", w.Code)
 	}
 }
+
+// TestItemHandler_ErrorResponseFormat verifica o formato padronizado de erro
+func TestItemHandler_ErrorResponseFormat(t *testing.T) {
+	handler, _ := setupItemHandler()
+
+	router := gin.New()
+	router.GET("/items/:id", handler.GetItemByID)
+
+	req, _ := http.NewRequest("GET", "/items/invalid", nil)
+	w := httptest.NewRecorder()
+	router.ServeHTTP(w, req)
+
+	if w.Code != http.StatusBadRequest {
+		t.Errorf("Expected status 400, got %d", w.Code)
+	}
+
+	// Verificar formato ErrorResponse
+	var errorResponse dto.ErrorResponse
+	err := json.Unmarshal(w.Body.Bytes(), &errorResponse)
+	if err != nil {
+		t.Errorf("Failed to unmarshal error response: %v", err)
+	}
+
+	// Verificar que tem código de erro
+	if errorResponse.Code == "" {
+		t.Error("Expected error code to be set")
+	}
+
+	// Verificar que tem mensagem de erro
+	if errorResponse.Error == "" {
+		t.Error("Expected error message to be set")
+	}
+
+	// Verificar que o código é INVALID_ID
+	if errorResponse.Code != dto.ErrCodeInvalidID {
+		t.Errorf("Expected error code '%s', got '%s'", dto.ErrCodeInvalidID, errorResponse.Code)
+	}
+}
