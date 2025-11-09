@@ -951,10 +951,10 @@ const docTemplate = `{
         "github_com_rafaelc-rb_geekery-api_internal_models.AnimeData": {
             "type": "object",
             "properties": {
-                "createdAt": {
+                "created_at": {
                     "type": "string"
                 },
-                "deletedAt": {
+                "deleted_at": {
                     "$ref": "#/definitions/gorm.DeletedAt"
                 },
                 "episodes": {
@@ -970,7 +970,7 @@ const docTemplate = `{
                 "studio": {
                     "type": "string"
                 },
-                "updatedAt": {
+                "updated_at": {
                     "type": "string"
                 }
             }
@@ -985,10 +985,10 @@ const docTemplate = `{
                     "description": "Total de capítulos",
                     "type": "integer"
                 },
-                "createdAt": {
+                "created_at": {
                     "type": "string"
                 },
-                "deletedAt": {
+                "deleted_at": {
                     "$ref": "#/definitions/gorm.DeletedAt"
                 },
                 "id": {
@@ -1002,7 +1002,7 @@ const docTemplate = `{
                     "description": "Total de páginas",
                     "type": "integer"
                 },
-                "updatedAt": {
+                "updated_at": {
                     "type": "string"
                 },
                 "volumes": {
@@ -1018,10 +1018,10 @@ const docTemplate = `{
                     "description": "Horas médias para completar",
                     "type": "integer"
                 },
-                "createdAt": {
+                "created_at": {
                     "type": "string"
                 },
-                "deletedAt": {
+                "deleted_at": {
                     "$ref": "#/definitions/gorm.DeletedAt"
                 },
                 "developer": {
@@ -1038,7 +1038,7 @@ const docTemplate = `{
                     "description": "PC, PS5, Switch, Xbox, etc",
                     "type": "string"
                 },
-                "updatedAt": {
+                "updated_at": {
                     "type": "string"
                 }
             }
@@ -1060,10 +1060,10 @@ const docTemplate = `{
                 "cover_url": {
                     "type": "string"
                 },
-                "createdAt": {
+                "created_at": {
                     "type": "string"
                 },
-                "deletedAt": {
+                "deleted_at": {
                     "$ref": "#/definitions/gorm.DeletedAt"
                 },
                 "description": {
@@ -1108,7 +1108,7 @@ const docTemplate = `{
                 "type": {
                     "$ref": "#/definitions/github_com_rafaelc-rb_geekery-api_internal_models.MediaType"
                 },
-                "updatedAt": {
+                "updated_at": {
                     "type": "string"
                 }
             }
@@ -1174,10 +1174,10 @@ const docTemplate = `{
         "github_com_rafaelc-rb_geekery-api_internal_models.MovieData": {
             "type": "object",
             "properties": {
-                "createdAt": {
+                "created_at": {
                     "type": "string"
                 },
-                "deletedAt": {
+                "deleted_at": {
                     "$ref": "#/definitions/gorm.DeletedAt"
                 },
                 "director": {
@@ -1194,7 +1194,7 @@ const docTemplate = `{
                     "description": "em minutos",
                     "type": "integer"
                 },
-                "updatedAt": {
+                "updated_at": {
                     "type": "string"
                 }
             }
@@ -1208,10 +1208,10 @@ const docTemplate = `{
                 "artist": {
                     "type": "string"
                 },
-                "createdAt": {
+                "created_at": {
                     "type": "string"
                 },
-                "deletedAt": {
+                "deleted_at": {
                     "$ref": "#/definitions/gorm.DeletedAt"
                 },
                 "duration": {
@@ -1229,7 +1229,7 @@ const docTemplate = `{
                     "description": "Número de faixas",
                     "type": "integer"
                 },
-                "updatedAt": {
+                "updated_at": {
                     "type": "string"
                 }
             }
@@ -1268,10 +1268,10 @@ const docTemplate = `{
         "github_com_rafaelc-rb_geekery-api_internal_models.SeriesData": {
             "type": "object",
             "properties": {
-                "createdAt": {
+                "created_at": {
                     "type": "string"
                 },
-                "deletedAt": {
+                "deleted_at": {
                     "$ref": "#/definitions/gorm.DeletedAt"
                 },
                 "episodes": {
@@ -1288,7 +1288,7 @@ const docTemplate = `{
                 "seasons": {
                     "type": "integer"
                 },
-                "updatedAt": {
+                "updated_at": {
                     "type": "string"
                 }
             }
@@ -1296,10 +1296,10 @@ const docTemplate = `{
         "github_com_rafaelc-rb_geekery-api_internal_models.Tag": {
             "type": "object",
             "properties": {
-                "createdAt": {
+                "created_at": {
                     "type": "string"
                 },
-                "deletedAt": {
+                "deleted_at": {
                     "$ref": "#/definitions/gorm.DeletedAt"
                 },
                 "id": {
@@ -1314,7 +1314,7 @@ const docTemplate = `{
                 "name": {
                     "type": "string"
                 },
-                "updatedAt": {
+                "updated_at": {
                     "type": "string"
                 }
             }
@@ -1322,10 +1322,10 @@ const docTemplate = `{
         "github_com_rafaelc-rb_geekery-api_internal_models.User": {
             "type": "object",
             "properties": {
-                "createdAt": {
+                "created_at": {
                     "type": "string"
                 },
-                "deletedAt": {
+                "deleted_at": {
                     "$ref": "#/definitions/gorm.DeletedAt"
                 },
                 "email": {
@@ -1337,7 +1337,7 @@ const docTemplate = `{
                 "name": {
                     "type": "string"
                 },
-                "updatedAt": {
+                "updated_at": {
                     "type": "string"
                 },
                 "user_items": {
@@ -1352,13 +1352,12 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "completion_count": {
-                    "description": "Contador de conclusões (quantas vezes completou 100%)",
                     "type": "integer"
                 },
-                "createdAt": {
+                "created_at": {
                     "type": "string"
                 },
-                "deletedAt": {
+                "deleted_at": {
                     "$ref": "#/definitions/gorm.DeletedAt"
                 },
                 "favorite": {
@@ -1385,12 +1384,7 @@ const docTemplate = `{
                     ]
                 },
                 "progress_type": {
-                    "description": "Sistema de progresso flexível",
-                    "allOf": [
-                        {
-                            "$ref": "#/definitions/github_com_rafaelc-rb_geekery-api_internal_models.ProgressType"
-                        }
-                    ]
+                    "$ref": "#/definitions/github_com_rafaelc-rb_geekery-api_internal_models.ProgressType"
                 },
                 "rating": {
                     "type": "number"
@@ -1398,7 +1392,7 @@ const docTemplate = `{
                 "status": {
                     "$ref": "#/definitions/github_com_rafaelc-rb_geekery-api_internal_models.MediaStatus"
                 },
-                "updatedAt": {
+                "updated_at": {
                     "type": "string"
                 },
                 "user": {

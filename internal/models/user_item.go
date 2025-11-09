@@ -1,6 +1,8 @@
 package models
 
 import (
+	"time"
+
 	"gorm.io/gorm"
 )
 
@@ -8,20 +10,19 @@ import (
 // Relaciona um usuário com um item do catálogo, incluindo dados pessoais
 // como status, rating, notas, etc.
 type UserItem struct {
-	gorm.Model
-	UserID      uint        `json:"user_id" gorm:"not null;index:idx_user_item,unique"`
-	ItemID      uint        `json:"item_id" gorm:"not null;index:idx_user_item,unique"`
-	Status      MediaStatus `json:"status" gorm:"type:varchar(50);default:'planned';check:status IN ('planned','in_progress','completed','paused','dropped')"`
-	Rating      float64     `json:"rating" gorm:"default:0"`
-	Favorite    bool        `json:"favorite" gorm:"default:false"`
-	Notes       string      `json:"notes" gorm:"type:text"`
-
-	// Sistema de progresso flexível
-	ProgressType ProgressType `json:"progress_type" gorm:"type:varchar(50);check:progress_type IN ('episodic','reading','time','percent','boolean')"`
-	ProgressData JSONB        `json:"progress_data" gorm:"type:jsonb"` // Dados flexíveis de progresso + history
-
-	// Contador de conclusões (quantas vezes completou 100%)
-	CompletionCount int `json:"completion_count" gorm:"default:0"`
+	ID              uint           `json:"id" gorm:"primarykey"`
+	CreatedAt       time.Time      `json:"created_at"`
+	UpdatedAt       time.Time      `json:"updated_at"`
+	DeletedAt       gorm.DeletedAt `json:"deleted_at,omitempty" gorm:"index"`
+	UserID          uint           `json:"user_id" gorm:"not null;index:idx_user_item,unique"`
+	ItemID          uint           `json:"item_id" gorm:"not null;index:idx_user_item,unique"`
+	Status          MediaStatus    `json:"status" gorm:"type:varchar(50);default:'planned';check:status IN ('planned','in_progress','completed','paused','dropped')"`
+	Rating          float64        `json:"rating" gorm:"default:0"`
+	Favorite        bool           `json:"favorite" gorm:"default:false"`
+	Notes           string         `json:"notes" gorm:"type:text"`
+	ProgressType    ProgressType   `json:"progress_type" gorm:"type:varchar(50);check:progress_type IN ('episodic','reading','time','percent','boolean')"`
+	ProgressData    JSONB          `json:"progress_data" gorm:"type:jsonb"` // Dados flexíveis de progresso + history
+	CompletionCount int            `json:"completion_count" gorm:"default:0"`
 
 	// Relationships
 	User User `json:"user,omitempty" gorm:"foreignKey:UserID"`

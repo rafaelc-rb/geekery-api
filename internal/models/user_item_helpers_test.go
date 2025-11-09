@@ -2,8 +2,6 @@ package models
 
 import (
 	"testing"
-
-	"gorm.io/gorm"
 )
 
 func TestUserItem_SetEpisodicProgress(t *testing.T) {
@@ -131,8 +129,8 @@ func TestUserItem_CompleteCurrentView(t *testing.T) {
 
 func TestUserItem_GetProgressPercent_Episodic(t *testing.T) {
 	item := &Item{
-		Model: gorm.Model{ID: 1}, // Adicionar ID
-		Type:  MediaTypeAnime,
+		ID:   1,
+		Type: MediaTypeAnime,
 		AnimeData: &AnimeData{
 			Episodes: 24,
 		},
@@ -170,8 +168,8 @@ func TestUserItem_GetProgressPercent_Reading(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			item := &Item{
-				Model: gorm.Model{ID: 1}, // Adicionar ID
-				Type:  MediaTypeManga,
+				ID:   1,
+				Type: MediaTypeManga,
 				BookData: &BookData{
 					Chapters: tt.chapters,
 					Volumes:  tt.volumes,

@@ -23,9 +23,9 @@ definitions:
     type: object
   github_com_rafaelc-rb_geekery-api_internal_models.AnimeData:
     properties:
-      createdAt:
+      created_at:
         type: string
-      deletedAt:
+      deleted_at:
         $ref: '#/definitions/gorm.DeletedAt'
       episodes:
         type: integer
@@ -36,7 +36,7 @@ definitions:
         type: integer
       studio:
         type: string
-      updatedAt:
+      updated_at:
         type: string
     type: object
   github_com_rafaelc-rb_geekery-api_internal_models.BookData:
@@ -46,9 +46,9 @@ definitions:
       chapters:
         description: Total de capítulos
         type: integer
-      createdAt:
+      created_at:
         type: string
-      deletedAt:
+      deleted_at:
         $ref: '#/definitions/gorm.DeletedAt'
       id:
         type: integer
@@ -58,7 +58,7 @@ definitions:
       pages:
         description: Total de páginas
         type: integer
-      updatedAt:
+      updated_at:
         type: string
       volumes:
         description: Total de volumes (manga/LN sempre tem, books às vezes)
@@ -69,9 +69,9 @@ definitions:
       average_playtime:
         description: Horas médias para completar
         type: integer
-      createdAt:
+      created_at:
         type: string
-      deletedAt:
+      deleted_at:
         $ref: '#/definitions/gorm.DeletedAt'
       developer:
         type: string
@@ -83,7 +83,7 @@ definitions:
       platform:
         description: PC, PS5, Switch, Xbox, etc
         type: string
-      updatedAt:
+      updated_at:
         type: string
     type: object
   github_com_rafaelc-rb_geekery-api_internal_models.Item:
@@ -97,9 +97,9 @@ definitions:
         $ref: '#/definitions/github_com_rafaelc-rb_geekery-api_internal_models.BookData'
       cover_url:
         type: string
-      createdAt:
+      created_at:
         type: string
-      deletedAt:
+      deleted_at:
         $ref: '#/definitions/gorm.DeletedAt'
       description:
         type: string
@@ -128,7 +128,7 @@ definitions:
         type: string
       type:
         $ref: '#/definitions/github_com_rafaelc-rb_geekery-api_internal_models.MediaType'
-      updatedAt:
+      updated_at:
         type: string
     type: object
   github_com_rafaelc-rb_geekery-api_internal_models.JSONB:
@@ -182,9 +182,9 @@ definitions:
     - MediaTypeBook
   github_com_rafaelc-rb_geekery-api_internal_models.MovieData:
     properties:
-      createdAt:
+      created_at:
         type: string
-      deletedAt:
+      deleted_at:
         $ref: '#/definitions/gorm.DeletedAt'
       director:
         type: string
@@ -196,7 +196,7 @@ definitions:
       runtime:
         description: em minutos
         type: integer
-      updatedAt:
+      updated_at:
         type: string
     type: object
   github_com_rafaelc-rb_geekery-api_internal_models.MusicData:
@@ -205,9 +205,9 @@ definitions:
         type: string
       artist:
         type: string
-      createdAt:
+      created_at:
         type: string
-      deletedAt:
+      deleted_at:
         $ref: '#/definitions/gorm.DeletedAt'
       duration:
         description: Duração total do álbum em segundos
@@ -220,7 +220,7 @@ definitions:
       tracks:
         description: Número de faixas
         type: integer
-      updatedAt:
+      updated_at:
         type: string
     type: object
   github_com_rafaelc-rb_geekery-api_internal_models.ProgressType:
@@ -252,9 +252,9 @@ definitions:
     - ProgressTypeBoolean
   github_com_rafaelc-rb_geekery-api_internal_models.SeriesData:
     properties:
-      createdAt:
+      created_at:
         type: string
-      deletedAt:
+      deleted_at:
         $ref: '#/definitions/gorm.DeletedAt'
       episodes:
         description: Total de episódios
@@ -266,14 +266,14 @@ definitions:
         type: integer
       seasons:
         type: integer
-      updatedAt:
+      updated_at:
         type: string
     type: object
   github_com_rafaelc-rb_geekery-api_internal_models.Tag:
     properties:
-      createdAt:
+      created_at:
         type: string
-      deletedAt:
+      deleted_at:
         $ref: '#/definitions/gorm.DeletedAt'
       id:
         type: integer
@@ -283,14 +283,14 @@ definitions:
         type: array
       name:
         type: string
-      updatedAt:
+      updated_at:
         type: string
     type: object
   github_com_rafaelc-rb_geekery-api_internal_models.User:
     properties:
-      createdAt:
+      created_at:
         type: string
-      deletedAt:
+      deleted_at:
         $ref: '#/definitions/gorm.DeletedAt'
       email:
         type: string
@@ -298,7 +298,7 @@ definitions:
         type: integer
       name:
         type: string
-      updatedAt:
+      updated_at:
         type: string
       user_items:
         items:
@@ -308,11 +308,10 @@ definitions:
   github_com_rafaelc-rb_geekery-api_internal_models.UserItem:
     properties:
       completion_count:
-        description: Contador de conclusões (quantas vezes completou 100%)
         type: integer
-      createdAt:
+      created_at:
         type: string
-      deletedAt:
+      deleted_at:
         $ref: '#/definitions/gorm.DeletedAt'
       favorite:
         type: boolean
@@ -329,14 +328,12 @@ definitions:
         - $ref: '#/definitions/github_com_rafaelc-rb_geekery-api_internal_models.JSONB'
         description: Dados flexíveis de progresso + history
       progress_type:
-        allOf:
-        - $ref: '#/definitions/github_com_rafaelc-rb_geekery-api_internal_models.ProgressType'
-        description: Sistema de progresso flexível
+        $ref: '#/definitions/github_com_rafaelc-rb_geekery-api_internal_models.ProgressType'
       rating:
         type: number
       status:
         $ref: '#/definitions/github_com_rafaelc-rb_geekery-api_internal_models.MediaStatus'
-      updatedAt:
+      updated_at:
         type: string
       user:
         allOf:

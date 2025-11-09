@@ -42,14 +42,17 @@ func (j *JSONB) Scan(value interface{}) error {
 // Este é o catálogo compartilhado - cada item existe apenas UMA vez
 // Usuários adicionam items à sua lista pessoal via UserItem
 type Item struct {
-	gorm.Model
-	Title            string     `json:"title" gorm:"not null;index"`
-	Type             MediaType  `json:"type" gorm:"type:varchar(50);not null;index;check:type IN ('anime','movie','series','game','manga','light_novel','music','book')"`
-	Description      string     `json:"description" gorm:"type:text"`
-	ReleaseDate      *time.Time `json:"release_date" gorm:"index"` // Data de lançamento/estreia
-	CoverURL         string     `json:"cover_url"`
-	ExternalMetadata JSONB      `json:"external_metadata" gorm:"type:jsonb"` // Metadados de APIs externas (MAL, IMDb, etc)
-	Tags             []Tag      `json:"tags,omitempty" gorm:"many2many:item_tags;"`
+	ID          uint           `json:"id" gorm:"primarykey"`
+	CreatedAt   time.Time      `json:"created_at"`
+	UpdatedAt   time.Time      `json:"updated_at"`
+	DeletedAt   gorm.DeletedAt `json:"deleted_at,omitempty" gorm:"index"`
+	Title       string         `json:"title" gorm:"not null;index"`
+	Type        MediaType      `json:"type" gorm:"type:varchar(50);not null;index;check:type IN ('anime','movie','series','game','manga','light_novel','music','book')"`
+	Description string         `json:"description" gorm:"type:text"`
+	ReleaseDate *time.Time     `json:"release_date" gorm:"index"` // Data de lançamento/estreia
+	CoverURL    string         `json:"cover_url"`
+	ExternalMetadata JSONB     `json:"external_metadata" gorm:"type:jsonb"` // Metadados de APIs externas (MAL, IMDb, etc)
+	Tags        []Tag          `json:"tags,omitempty" gorm:"many2many:item_tags;"`
 
 	// Dados específicos por tipo (apenas um será não-nil baseado no Type)
 	AnimeData  *AnimeData  `json:"anime_data,omitempty" gorm:"foreignKey:ItemID;constraint:OnDelete:CASCADE"`
