@@ -4,6 +4,7 @@ import (
 	"context"
 	"testing"
 
+	"github.com/rafaelc-rb/geekery-api/internal/dto"
 	"github.com/rafaelc-rb/geekery-api/internal/models"
 	"github.com/rafaelc-rb/geekery-api/internal/testutil"
 	"gorm.io/gorm"
@@ -95,19 +96,23 @@ func TestGetMyList_Success(t *testing.T) {
 	}
 
 	mockUserItemRepo := &testutil.MockUserItemRepository{
-		GetByUserIDFunc: func(ctx context.Context, userID uint) ([]models.UserItem, error) {
-			return expectedItems, nil
+		GetByUserIDFunc: func(ctx context.Context, userID uint, params dto.PaginationParams) ([]models.UserItem, int64, error) {
+			return expectedItems, 2, nil
 		},
 	}
 
 	service := NewUserItemService(mockUserItemRepo, nil)
-	items, err := service.GetMyList(ctx, 1)
+	params := dto.PaginationParams{Page: 1, Limit: 20}
+	items, total, err := service.GetMyList(ctx, 1, params)
 
 	if err != nil {
 		t.Errorf("Expected no error, got %v", err)
 	}
 	if len(items) != 2 {
 		t.Errorf("Expected 2 items, got %d", len(items))
+	}
+	if total != 2 {
+		t.Errorf("Expected total 2, got %d", total)
 	}
 }
 
@@ -118,19 +123,23 @@ func TestGetMyListByStatus_Success(t *testing.T) {
 	}
 
 	mockUserItemRepo := &testutil.MockUserItemRepository{
-		GetByStatusFunc: func(ctx context.Context, userID uint, status models.MediaStatus) ([]models.UserItem, error) {
-			return expectedItems, nil
+		GetByStatusFunc: func(ctx context.Context, userID uint, status models.MediaStatus, params dto.PaginationParams) ([]models.UserItem, int64, error) {
+			return expectedItems, 1, nil
 		},
 	}
 
 	service := NewUserItemService(mockUserItemRepo, nil)
-	items, err := service.GetMyListByStatus(ctx, 1, models.StatusCompleted)
+	params := dto.PaginationParams{Page: 1, Limit: 20}
+	items, total, err := service.GetMyListByStatus(ctx, 1, models.StatusCompleted, params)
 
 	if err != nil {
 		t.Errorf("Expected no error, got %v", err)
 	}
 	if len(items) != 1 {
 		t.Errorf("Expected 1 item, got %d", len(items))
+	}
+	if total != 1 {
+		t.Errorf("Expected total 1, got %d", total)
 	}
 }
 
@@ -267,19 +276,23 @@ func TestGetMyFavorites_Success(t *testing.T) {
 	}
 
 	mockUserItemRepo := &testutil.MockUserItemRepository{
-		GetFavoritesFunc: func(ctx context.Context, userID uint) ([]models.UserItem, error) {
-			return expectedItems, nil
+		GetFavoritesFunc: func(ctx context.Context, userID uint, params dto.PaginationParams) ([]models.UserItem, int64, error) {
+			return expectedItems, 2, nil
 		},
 	}
 
 	service := NewUserItemService(mockUserItemRepo, nil)
-	items, err := service.GetMyFavorites(ctx, 1)
+	params := dto.PaginationParams{Page: 1, Limit: 20}
+	items, total, err := service.GetMyFavorites(ctx, 1, params)
 
 	if err != nil {
 		t.Errorf("Expected no error, got %v", err)
 	}
 	if len(items) != 2 {
 		t.Errorf("Expected 2 favorites, got %d", len(items))
+	}
+	if total != 2 {
+		t.Errorf("Expected total 2, got %d", total)
 	}
 }
 

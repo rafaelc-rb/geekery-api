@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 
+	"github.com/rafaelc-rb/geekery-api/internal/dto"
 	"github.com/rafaelc-rb/geekery-api/internal/models"
 	"gorm.io/gorm"
 )
@@ -22,11 +23,29 @@ func (r *UserItemRepository) Create(ctx context.Context, userItem *models.UserIt
 	return r.db.WithContext(ctx).Create(userItem).Error
 }
 
-// GetByUserID retorna todos os items da lista de um usuário
-func (r *UserItemRepository) GetByUserID(ctx context.Context, userID uint) ([]models.UserItem, error) {
+// GetByUserID retorna todos os items da lista de um usuário com paginação
+func (r *UserItemRepository) GetByUserID(ctx context.Context, userID uint, params dto.PaginationParams) ([]models.UserItem, int64, error) {
 	var userItems []models.UserItem
-	err := r.db.WithContext(ctx).Preload("Item").Preload("Item.Tags").Where("user_id = ?", userID).Find(&userItems).Error
-	return userItems, err
+	var total int64
+
+	// Normalizar parâmetros
+	params.Normalize()
+
+	// Contar total de items do usuário
+	if err := r.db.WithContext(ctx).Model(&models.UserItem{}).Where("user_id = ?", userID).Count(&total).Error; err != nil {
+		return nil, 0, err
+	}
+
+	// Buscar items paginados
+	err := r.db.WithContext(ctx).
+		Preload("Item").
+		Preload("Item.Tags").
+		Where("user_id = ?", userID).
+		Limit(params.Limit).
+		Offset(params.GetOffset()).
+		Find(&userItems).Error
+
+	return userItems, total, err
 }
 
 // GetByUserAndItem busca um item específico na lista do usuário
@@ -66,22 +85,58 @@ func (r *UserItemRepository) Exists(ctx context.Context, userID, itemID uint) (b
 	return count > 0, err
 }
 
-// GetByStatus retorna items do usuário filtrados por status
-func (r *UserItemRepository) GetByStatus(ctx context.Context, userID uint, status models.MediaStatus) ([]models.UserItem, error) {
+// GetByStatus retorna items do usuário filtrados por status com paginação
+func (r *UserItemRepository) GetByStatus(ctx context.Context, userID uint, status models.MediaStatus, params dto.PaginationParams) ([]models.UserItem, int64, error) {
 	var userItems []models.UserItem
-	err := r.db.WithContext(ctx).Preload("Item").Preload("Item.Tags").
+	var total int64
+
+	// Normalizar parâmetros
+	params.Normalize()
+
+	// Contar total de items com o status
+	if err := r.db.WithContext(ctx).Model(&models.UserItem{}).
 		Where("user_id = ? AND status = ?", userID, status).
+		Count(&total).Error; err != nil {
+		return nil, 0, err
+	}
+
+	// Buscar items paginados
+	err := r.db.WithContext(ctx).
+		Preload("Item").
+		Preload("Item.Tags").
+		Where("user_id = ? AND status = ?", userID, status).
+		Limit(params.Limit).
+		Offset(params.GetOffset()).
 		Find(&userItems).Error
-	return userItems, err
+
+	return userItems, total, err
 }
 
-// GetFavorites retorna todos os items favoritos do usuário
-func (r *UserItemRepository) GetFavorites(ctx context.Context, userID uint) ([]models.UserItem, error) {
+// GetFavorites retorna todos os items favoritos do usuário com paginação
+func (r *UserItemRepository) GetFavorites(ctx context.Context, userID uint, params dto.PaginationParams) ([]models.UserItem, int64, error) {
 	var userItems []models.UserItem
-	err := r.db.WithContext(ctx).Preload("Item").Preload("Item.Tags").
+	var total int64
+
+	// Normalizar parâmetros
+	params.Normalize()
+
+	// Contar total de favoritos
+	if err := r.db.WithContext(ctx).Model(&models.UserItem{}).
 		Where("user_id = ? AND favorite = ?", userID, true).
+		Count(&total).Error; err != nil {
+		return nil, 0, err
+	}
+
+	// Buscar items paginados
+	err := r.db.WithContext(ctx).
+		Preload("Item").
+		Preload("Item.Tags").
+		Where("user_id = ? AND favorite = ?", userID, true).
+		Limit(params.Limit).
+		Offset(params.GetOffset()).
 		Find(&userItems).Error
-	return userItems, err
+
+	return userItems, total, err
 }
 
 // GetStatistics retorna estatísticas da lista do usuário

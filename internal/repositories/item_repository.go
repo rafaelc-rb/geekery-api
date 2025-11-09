@@ -3,6 +3,7 @@ package repositories
 import (
 	"context"
 
+	"github.com/rafaelc-rb/geekery-api/internal/dto"
 	"github.com/rafaelc-rb/geekery-api/internal/models"
 	"gorm.io/gorm"
 )
@@ -21,11 +22,27 @@ func (r *ItemRepository) Create(ctx context.Context, item *models.Item) error {
 	return r.db.WithContext(ctx).Create(item).Error
 }
 
-// GetAll retorna todos os items do catálogo
-func (r *ItemRepository) GetAll(ctx context.Context) ([]models.Item, error) {
+// GetAll retorna todos os items do catálogo com paginação
+func (r *ItemRepository) GetAll(ctx context.Context, params dto.PaginationParams) ([]models.Item, int64, error) {
 	var items []models.Item
-	err := r.db.WithContext(ctx).Preload("Tags").Find(&items).Error
-	return items, err
+	var total int64
+
+	// Normalizar parâmetros
+	params.Normalize()
+
+	// Contar total de items
+	if err := r.db.WithContext(ctx).Model(&models.Item{}).Count(&total).Error; err != nil {
+		return nil, 0, err
+	}
+
+	// Buscar items paginados
+	err := r.db.WithContext(ctx).
+		Preload("Tags").
+		Limit(params.Limit).
+		Offset(params.GetOffset()).
+		Find(&items).Error
+
+	return items, total, err
 }
 
 // GetByID retorna um item específico pelo ID com Preload condicional baseado no tipo
@@ -94,22 +111,38 @@ func (r *ItemRepository) preloadSpecificData(ctx context.Context, item *models.I
 	return nil
 }
 
-// GetByType retorna items filtrados por tipo com dados específicos
-func (r *ItemRepository) GetByType(ctx context.Context, mediaType models.MediaType) ([]models.Item, error) {
+// GetByType retorna items filtrados por tipo com dados específicos e paginação
+func (r *ItemRepository) GetByType(ctx context.Context, mediaType models.MediaType, params dto.PaginationParams) ([]models.Item, int64, error) {
 	var items []models.Item
-	err := r.db.WithContext(ctx).Preload("Tags").Where("type = ?", mediaType).Find(&items).Error
+	var total int64
+
+	// Normalizar parâmetros
+	params.Normalize()
+
+	// Contar total de items do tipo
+	if err := r.db.WithContext(ctx).Model(&models.Item{}).Where("type = ?", mediaType).Count(&total).Error; err != nil {
+		return nil, 0, err
+	}
+
+	// Buscar items paginados
+	err := r.db.WithContext(ctx).
+		Preload("Tags").
+		Where("type = ?", mediaType).
+		Limit(params.Limit).
+		Offset(params.GetOffset()).
+		Find(&items).Error
 	if err != nil {
-		return nil, err
+		return nil, 0, err
 	}
 
 	// Preload dados específicos para todos os items do tipo
 	for i := range items {
 		if err := r.preloadSpecificData(ctx, &items[i]); err != nil {
-			return nil, err
+			return nil, 0, err
 		}
 	}
 
-	return items, nil
+	return items, total, nil
 }
 
 // Update atualiza um item existente no catálogo
@@ -122,11 +155,31 @@ func (r *ItemRepository) Delete(ctx context.Context, id uint) error {
 	return r.db.WithContext(ctx).Delete(&models.Item{}, id).Error
 }
 
-// SearchByTitle busca items por título (case-insensitive)
-func (r *ItemRepository) SearchByTitle(ctx context.Context, query string) ([]models.Item, error) {
+// SearchByTitle busca items por título (case-insensitive) com paginação
+func (r *ItemRepository) SearchByTitle(ctx context.Context, query string, params dto.PaginationParams) ([]models.Item, int64, error) {
 	var items []models.Item
-	err := r.db.WithContext(ctx).Preload("Tags").Where("LOWER(title) LIKE LOWER(?)", "%"+query+"%").Find(&items).Error
-	return items, err
+	var total int64
+
+	// Normalizar parâmetros
+	params.Normalize()
+
+	// Contar total de resultados
+	searchQuery := "%" + query + "%"
+	if err := r.db.WithContext(ctx).Model(&models.Item{}).
+		Where("LOWER(title) LIKE LOWER(?)", searchQuery).
+		Count(&total).Error; err != nil {
+		return nil, 0, err
+	}
+
+	// Buscar items paginados
+	err := r.db.WithContext(ctx).
+		Preload("Tags").
+		Where("LOWER(title) LIKE LOWER(?)", searchQuery).
+		Limit(params.Limit).
+		Offset(params.GetOffset()).
+		Find(&items).Error
+
+	return items, total, err
 }
 
 // GetByExternalID busca um item por ID externo (MAL, IMDb, etc)

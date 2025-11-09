@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/rafaelc-rb/geekery-api/internal/dto"
 	"github.com/rafaelc-rb/geekery-api/internal/models"
 	"github.com/rafaelc-rb/geekery-api/internal/repositories"
 	"gorm.io/gorm"
@@ -72,9 +73,9 @@ func (s *ItemService) CreateItemWithSpecificData(ctx context.Context, item *mode
 	return nil
 }
 
-// GetAllItems retorna todos os items do catálogo
-func (s *ItemService) GetAllItems(ctx context.Context) ([]models.Item, error) {
-	return s.itemRepo.GetAll(ctx)
+// GetAllItems retorna todos os items do catálogo com paginação
+func (s *ItemService) GetAllItems(ctx context.Context, params dto.PaginationParams) ([]models.Item, int64, error) {
+	return s.itemRepo.GetAll(ctx, params)
 }
 
 // GetItemByID retorna um item específico do catálogo
@@ -89,20 +90,20 @@ func (s *ItemService) GetItemByID(ctx context.Context, id uint) (*models.Item, e
 	return item, nil
 }
 
-// GetItemsByType retorna items filtrados por tipo
-func (s *ItemService) GetItemsByType(ctx context.Context, mediaType models.MediaType) ([]models.Item, error) {
+// GetItemsByType retorna items filtrados por tipo com paginação
+func (s *ItemService) GetItemsByType(ctx context.Context, mediaType models.MediaType, params dto.PaginationParams) ([]models.Item, int64, error) {
 	if !mediaType.IsValid() {
-		return nil, models.ErrInvalidMediaType
+		return nil, 0, models.ErrInvalidMediaType
 	}
-	return s.itemRepo.GetByType(ctx, mediaType)
+	return s.itemRepo.GetByType(ctx, mediaType, params)
 }
 
-// SearchItems busca items por título
-func (s *ItemService) SearchItems(ctx context.Context, query string) ([]models.Item, error) {
+// SearchItems busca items por título com paginação
+func (s *ItemService) SearchItems(ctx context.Context, query string, params dto.PaginationParams) ([]models.Item, int64, error) {
 	if query == "" {
-		return s.itemRepo.GetAll(ctx)
+		return s.itemRepo.GetAll(ctx, params)
 	}
-	return s.itemRepo.SearchByTitle(ctx, query)
+	return s.itemRepo.SearchByTitle(ctx, query, params)
 }
 
 // UpdateItem atualiza um item do catálogo (admin apenas)

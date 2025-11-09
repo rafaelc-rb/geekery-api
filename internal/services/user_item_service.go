@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/rafaelc-rb/geekery-api/internal/dto"
 	"github.com/rafaelc-rb/geekery-api/internal/models"
 	"github.com/rafaelc-rb/geekery-api/internal/repositories"
 	"gorm.io/gorm"
@@ -73,22 +74,22 @@ func (s *UserItemService) AddToList(ctx context.Context, userID uint, itemID uin
 	return userItem, nil
 }
 
-// GetMyList retorna a lista completa do usuário
-func (s *UserItemService) GetMyList(ctx context.Context, userID uint) ([]models.UserItem, error) {
-	return s.userItemRepo.GetByUserID(ctx, userID)
+// GetMyList retorna a lista completa do usuário com paginação
+func (s *UserItemService) GetMyList(ctx context.Context, userID uint, params dto.PaginationParams) ([]models.UserItem, int64, error) {
+	return s.userItemRepo.GetByUserID(ctx, userID, params)
 }
 
-// GetMyListByStatus retorna items da lista filtrados por status
-func (s *UserItemService) GetMyListByStatus(ctx context.Context, userID uint, status models.MediaStatus) ([]models.UserItem, error) {
+// GetMyListByStatus retorna items da lista filtrados por status com paginação
+func (s *UserItemService) GetMyListByStatus(ctx context.Context, userID uint, status models.MediaStatus, params dto.PaginationParams) ([]models.UserItem, int64, error) {
 	if !status.IsValid() {
-		return nil, models.ErrInvalidStatus
+		return nil, 0, models.ErrInvalidStatus
 	}
-	return s.userItemRepo.GetByStatus(ctx, userID, status)
+	return s.userItemRepo.GetByStatus(ctx, userID, status, params)
 }
 
-// GetMyFavorites retorna todos os items favoritos do usuário
-func (s *UserItemService) GetMyFavorites(ctx context.Context, userID uint) ([]models.UserItem, error) {
-	return s.userItemRepo.GetFavorites(ctx, userID)
+// GetMyFavorites retorna todos os items favoritos do usuário com paginação
+func (s *UserItemService) GetMyFavorites(ctx context.Context, userID uint, params dto.PaginationParams) ([]models.UserItem, int64, error) {
+	return s.userItemRepo.GetFavorites(ctx, userID, params)
 }
 
 // GetMyListItem retorna um item específico da lista do usuário

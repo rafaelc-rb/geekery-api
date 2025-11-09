@@ -9,6 +9,7 @@ import (
 	"testing"
 
 	"github.com/gin-gonic/gin"
+	"github.com/rafaelc-rb/geekery-api/internal/dto"
 	"github.com/rafaelc-rb/geekery-api/internal/models"
 	"github.com/rafaelc-rb/geekery-api/internal/services"
 	"github.com/rafaelc-rb/geekery-api/internal/testutil"
@@ -30,8 +31,8 @@ func TestItemHandler_GetAllItems(t *testing.T) {
 		{Title: "Item 2", Type: models.MediaTypeMovie},
 	}
 
-	mockRepo.GetAllFunc = func(ctx context.Context) ([]models.Item, error) {
-		return expectedItems, nil
+	mockRepo.GetAllFunc = func(ctx context.Context, params dto.PaginationParams) ([]models.Item, int64, error) {
+		return expectedItems, 2, nil
 	}
 
 	router := gin.New()
@@ -45,11 +46,16 @@ func TestItemHandler_GetAllItems(t *testing.T) {
 		t.Errorf("Expected status 200, got %d", w.Code)
 	}
 
-	var items []models.Item
-	err := json.Unmarshal(w.Body.Bytes(), &items)
+	var response dto.PaginatedResponse
+	err := json.Unmarshal(w.Body.Bytes(), &response)
 	if err != nil {
 		t.Errorf("Failed to unmarshal response: %v", err)
 	}
+
+	// Convert data back to items
+	itemsData, _ := json.Marshal(response.Data)
+	var items []models.Item
+	json.Unmarshal(itemsData, &items)
 
 	if len(items) != 2 {
 		t.Errorf("Expected 2 items, got %d", len(items))
@@ -197,8 +203,8 @@ func TestItemHandler_SearchItems(t *testing.T) {
 		{Title: "Attack on Titan", Type: models.MediaTypeAnime},
 	}
 
-	mockRepo.SearchByTitleFunc = func(ctx context.Context, query string) ([]models.Item, error) {
-		return expectedItems, nil
+	mockRepo.SearchByTitleFunc = func(ctx context.Context, query string, params dto.PaginationParams) ([]models.Item, int64, error) {
+		return expectedItems, 1, nil
 	}
 
 	router := gin.New()
@@ -212,11 +218,16 @@ func TestItemHandler_SearchItems(t *testing.T) {
 		t.Errorf("Expected status 200, got %d", w.Code)
 	}
 
-	var items []models.Item
-	err := json.Unmarshal(w.Body.Bytes(), &items)
+	var response dto.PaginatedResponse
+	err := json.Unmarshal(w.Body.Bytes(), &response)
 	if err != nil {
 		t.Errorf("Failed to unmarshal response: %v", err)
 	}
+
+	// Convert data back to items
+	itemsData, _ := json.Marshal(response.Data)
+	var items []models.Item
+	json.Unmarshal(itemsData, &items)
 
 	if len(items) != 1 {
 		t.Errorf("Expected 1 item, got %d", len(items))
@@ -227,8 +238,8 @@ func TestItemHandler_SearchItems_MissingQuery(t *testing.T) {
 	handler, mockRepo := setupItemHandler()
 
 	// O handler não valida query vazio, então retorna array vazio com status 200
-	mockRepo.SearchByTitleFunc = func(ctx context.Context, query string) ([]models.Item, error) {
-		return []models.Item{}, nil
+	mockRepo.GetAllFunc = func(ctx context.Context, params dto.PaginationParams) ([]models.Item, int64, error) {
+		return []models.Item{}, 0, nil
 	}
 
 	router := gin.New()

@@ -1,0 +1,1472 @@
+{
+    "schemes": [
+        "http",
+        "https"
+    ],
+    "swagger": "2.0",
+    "info": {
+        "description": "A personal geek media tracker API - Track anime, movies, series, games, manga, books and music\nFeatures: Personal lists, progress tracking, ratings, favorites, and more",
+        "title": "Geekery API",
+        "termsOfService": "http://swagger.io/terms/",
+        "contact": {
+            "name": "Rafael C Ribeiro",
+            "email": "support@geekery.dev"
+        },
+        "license": {
+            "name": "MIT",
+            "url": "https://opensource.org/licenses/MIT"
+        },
+        "version": "1.0"
+    },
+    "host": "localhost:8080",
+    "basePath": "/api",
+    "paths": {
+        "/items": {
+            "get": {
+                "description": "Get paginated list of all items from the global catalog",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "items"
+                ],
+                "summary": "Get all items",
+                "parameters": [
+                    {
+                        "minimum": 1,
+                        "type": "integer",
+                        "default": 1,
+                        "description": "Page number",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "maximum": 100,
+                        "minimum": 1,
+                        "type": "integer",
+                        "default": 20,
+                        "description": "Items per page",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "enum": [
+                            "anime",
+                            "movie",
+                            "series",
+                            "game",
+                            "manga",
+                            "light_novel",
+                            "music",
+                            "book"
+                        ],
+                        "type": "string",
+                        "description": "Filter by media type",
+                        "name": "type",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success - returns paginated items",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_rafaelc-rb_geekery-api_internal_dto.PaginatedResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request - invalid parameters",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Create a new item in the global catalog (admin only in the future)",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "items"
+                ],
+                "summary": "Create item",
+                "parameters": [
+                    {
+                        "description": "Item to create",
+                        "name": "item",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/github_com_rafaelc-rb_geekery-api_internal_models.Item"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Item created successfully",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_rafaelc-rb_geekery-api_internal_models.Item"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request - validation error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/items/search": {
+            "get": {
+                "description": "Search items by title (case-insensitive) with pagination",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "items"
+                ],
+                "summary": "Search items",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Search query",
+                        "name": "q",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "default": 1,
+                        "description": "Page number",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "default": 20,
+                        "description": "Items per page",
+                        "name": "limit",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success - returns matching items",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_rafaelc-rb_geekery-api_internal_dto.PaginatedResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/items/{id}": {
+            "get": {
+                "description": "Get a specific item from the catalog by its ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "items"
+                ],
+                "summary": "Get item by ID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Item ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success - returns item",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_rafaelc-rb_geekery-api_internal_models.Item"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request - invalid ID",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Item not found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            },
+            "put": {
+                "description": "Update an existing item in the catalog (admin only in the future)",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "items"
+                ],
+                "summary": "Update item",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Item ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Item data to update",
+                        "name": "item",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/github_com_rafaelc-rb_geekery-api_internal_models.Item"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Item updated successfully",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request - validation error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Item not found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Delete an item from the catalog (admin only in the future)",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "items"
+                ],
+                "summary": "Delete item",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Item ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Item deleted successfully"
+                    },
+                    "400": {
+                        "description": "Bad request - invalid ID",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Item not found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/my-list": {
+            "get": {
+                "description": "Get user's personal tracking list with pagination and filters",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "my-list"
+                ],
+                "summary": "Get my list",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "default": 1,
+                        "description": "Page number",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "default": 20,
+                        "description": "Items per page",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "enum": [
+                            "planned",
+                            "in_progress",
+                            "completed",
+                            "paused",
+                            "dropped"
+                        ],
+                        "type": "string",
+                        "description": "Filter by status",
+                        "name": "status",
+                        "in": "query"
+                    },
+                    {
+                        "type": "boolean",
+                        "description": "Filter favorites only",
+                        "name": "favorite",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success - returns user's items",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_rafaelc-rb_geekery-api_internal_dto.PaginatedResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request - invalid parameters",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Add a catalog item to user's personal tracking list",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "my-list"
+                ],
+                "summary": "Add item to my list",
+                "parameters": [
+                    {
+                        "description": "Item to add (item_id required, status optional)",
+                        "name": "item",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "item_id": {
+                                    "type": "integer"
+                                },
+                                "status": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Item added successfully",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_rafaelc-rb_geekery-api_internal_models.UserItem"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request - validation error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "409": {
+                        "description": "Conflict - item already in list",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/my-list/stats": {
+            "get": {
+                "description": "Get statistics about user's tracking list (totals by status, favorites count)",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "my-list"
+                ],
+                "summary": "Get list statistics",
+                "responses": {
+                    "200": {
+                        "description": "Success - returns statistics",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "integer",
+                                "format": "int64"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/my-list/{id}": {
+            "get": {
+                "description": "Get a specific item from user's list by ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "my-list"
+                ],
+                "summary": "Get list item",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "User Item ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success - returns user item",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_rafaelc-rb_geekery-api_internal_models.UserItem"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request - invalid ID",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Item not found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            },
+            "put": {
+                "description": "Update a user's list item (status, rating, progress, etc)",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "my-list"
+                ],
+                "summary": "Update list item",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "User Item ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Updated item data",
+                        "name": "item",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/github_com_rafaelc-rb_geekery-api_internal_models.UserItem"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Item updated successfully",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_rafaelc-rb_geekery-api_internal_models.UserItem"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request - validation error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Item not found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Remove an item from user's tracking list",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "my-list"
+                ],
+                "summary": "Remove from list",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "User Item ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Item removed successfully"
+                    },
+                    "400": {
+                        "description": "Bad request - invalid ID",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Item not found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/tags": {
+            "get": {
+                "description": "Get a list of all available tags",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "tags"
+                ],
+                "summary": "Get all tags",
+                "responses": {
+                    "200": {
+                        "description": "Success - returns all tags",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/github_com_rafaelc-rb_geekery-api_internal_models.Tag"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Create a new tag for categorizing items",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "tags"
+                ],
+                "summary": "Create tag",
+                "parameters": [
+                    {
+                        "description": "Tag data",
+                        "name": "tag",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/internal_handlers.CreateTagRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Tag created successfully",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_rafaelc-rb_geekery-api_internal_models.Tag"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request - validation error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/tags/{id}": {
+            "get": {
+                "description": "Get a specific tag by its ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "tags"
+                ],
+                "summary": "Get tag by ID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Tag ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success - returns tag",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_rafaelc-rb_geekery-api_internal_models.Tag"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request - invalid ID",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Tag not found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            },
+            "put": {
+                "description": "Update an existing tag's data",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "tags"
+                ],
+                "summary": "Update tag",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Tag ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Updated tag data",
+                        "name": "tag",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/internal_handlers.UpdateTagRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Tag updated successfully",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_rafaelc-rb_geekery-api_internal_models.Tag"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request - validation error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Tag not found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Delete a tag from the database",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "tags"
+                ],
+                "summary": "Delete tag",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Tag ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Tag deleted successfully",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request - invalid ID",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Tag not found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "github_com_rafaelc-rb_geekery-api_internal_dto.PaginatedResponse": {
+            "type": "object",
+            "properties": {
+                "data": {},
+                "pagination": {
+                    "$ref": "#/definitions/github_com_rafaelc-rb_geekery-api_internal_dto.PaginationMeta"
+                }
+            }
+        },
+        "github_com_rafaelc-rb_geekery-api_internal_dto.PaginationMeta": {
+            "type": "object",
+            "properties": {
+                "current_page": {
+                    "type": "integer"
+                },
+                "has_next": {
+                    "type": "boolean"
+                },
+                "has_previous": {
+                    "type": "boolean"
+                },
+                "items_per_page": {
+                    "type": "integer"
+                },
+                "total_items": {
+                    "type": "integer"
+                },
+                "total_pages": {
+                    "type": "integer"
+                }
+            }
+        },
+        "github_com_rafaelc-rb_geekery-api_internal_models.AnimeData": {
+            "type": "object",
+            "properties": {
+                "createdAt": {
+                    "type": "string"
+                },
+                "deletedAt": {
+                    "$ref": "#/definitions/gorm.DeletedAt"
+                },
+                "episodes": {
+                    "type": "integer"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "item_id": {
+                    "description": "FK para items",
+                    "type": "integer"
+                },
+                "studio": {
+                    "type": "string"
+                },
+                "updatedAt": {
+                    "type": "string"
+                }
+            }
+        },
+        "github_com_rafaelc-rb_geekery-api_internal_models.BookData": {
+            "type": "object",
+            "properties": {
+                "author": {
+                    "type": "string"
+                },
+                "chapters": {
+                    "description": "Total de capítulos",
+                    "type": "integer"
+                },
+                "createdAt": {
+                    "type": "string"
+                },
+                "deletedAt": {
+                    "$ref": "#/definitions/gorm.DeletedAt"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "item_id": {
+                    "description": "FK para items",
+                    "type": "integer"
+                },
+                "pages": {
+                    "description": "Total de páginas",
+                    "type": "integer"
+                },
+                "updatedAt": {
+                    "type": "string"
+                },
+                "volumes": {
+                    "description": "Total de volumes (manga/LN sempre tem, books às vezes)",
+                    "type": "integer"
+                }
+            }
+        },
+        "github_com_rafaelc-rb_geekery-api_internal_models.GameData": {
+            "type": "object",
+            "properties": {
+                "average_playtime": {
+                    "description": "Horas médias para completar",
+                    "type": "integer"
+                },
+                "createdAt": {
+                    "type": "string"
+                },
+                "deletedAt": {
+                    "$ref": "#/definitions/gorm.DeletedAt"
+                },
+                "developer": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "item_id": {
+                    "description": "FK para items",
+                    "type": "integer"
+                },
+                "platform": {
+                    "description": "PC, PS5, Switch, Xbox, etc",
+                    "type": "string"
+                },
+                "updatedAt": {
+                    "type": "string"
+                }
+            }
+        },
+        "github_com_rafaelc-rb_geekery-api_internal_models.Item": {
+            "type": "object",
+            "properties": {
+                "anime_data": {
+                    "description": "Dados específicos por tipo (apenas um será não-nil baseado no Type)",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/github_com_rafaelc-rb_geekery-api_internal_models.AnimeData"
+                        }
+                    ]
+                },
+                "book_data": {
+                    "$ref": "#/definitions/github_com_rafaelc-rb_geekery-api_internal_models.BookData"
+                },
+                "cover_url": {
+                    "type": "string"
+                },
+                "createdAt": {
+                    "type": "string"
+                },
+                "deletedAt": {
+                    "$ref": "#/definitions/gorm.DeletedAt"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "external_metadata": {
+                    "description": "Metadados de APIs externas (MAL, IMDb, etc)",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/github_com_rafaelc-rb_geekery-api_internal_models.JSONB"
+                        }
+                    ]
+                },
+                "game_data": {
+                    "$ref": "#/definitions/github_com_rafaelc-rb_geekery-api_internal_models.GameData"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "movie_data": {
+                    "$ref": "#/definitions/github_com_rafaelc-rb_geekery-api_internal_models.MovieData"
+                },
+                "music_data": {
+                    "$ref": "#/definitions/github_com_rafaelc-rb_geekery-api_internal_models.MusicData"
+                },
+                "release_date": {
+                    "description": "Data de lançamento/estreia",
+                    "type": "string"
+                },
+                "series_data": {
+                    "$ref": "#/definitions/github_com_rafaelc-rb_geekery-api_internal_models.SeriesData"
+                },
+                "tags": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/github_com_rafaelc-rb_geekery-api_internal_models.Tag"
+                    }
+                },
+                "title": {
+                    "type": "string"
+                },
+                "type": {
+                    "$ref": "#/definitions/github_com_rafaelc-rb_geekery-api_internal_models.MediaType"
+                },
+                "updatedAt": {
+                    "type": "string"
+                }
+            }
+        },
+        "github_com_rafaelc-rb_geekery-api_internal_models.JSONB": {
+            "type": "object",
+            "additionalProperties": true
+        },
+        "github_com_rafaelc-rb_geekery-api_internal_models.MediaStatus": {
+            "type": "string",
+            "enum": [
+                "planned",
+                "in_progress",
+                "completed",
+                "paused",
+                "dropped"
+            ],
+            "x-enum-comments": {
+                "StatusCompleted": "Completado/assistido/jogado/lido",
+                "StatusDropped": "Abandonado",
+                "StatusInProgress": "Assistindo/jogando/lendo/ouvindo",
+                "StatusPaused": "Pausado/em espera",
+                "StatusPlanned": "Quero assistir/jogar/ler/ouvir"
+            },
+            "x-enum-descriptions": [
+                "Quero assistir/jogar/ler/ouvir",
+                "Assistindo/jogando/lendo/ouvindo",
+                "Completado/assistido/jogado/lido",
+                "Pausado/em espera",
+                "Abandonado"
+            ],
+            "x-enum-varnames": [
+                "StatusPlanned",
+                "StatusInProgress",
+                "StatusCompleted",
+                "StatusPaused",
+                "StatusDropped"
+            ]
+        },
+        "github_com_rafaelc-rb_geekery-api_internal_models.MediaType": {
+            "type": "string",
+            "enum": [
+                "anime",
+                "movie",
+                "series",
+                "game",
+                "manga",
+                "light_novel",
+                "music",
+                "book"
+            ],
+            "x-enum-varnames": [
+                "MediaTypeAnime",
+                "MediaTypeMovie",
+                "MediaTypeSeries",
+                "MediaTypeGame",
+                "MediaTypeManga",
+                "MediaTypeLightNovel",
+                "MediaTypeMusic",
+                "MediaTypeBook"
+            ]
+        },
+        "github_com_rafaelc-rb_geekery-api_internal_models.MovieData": {
+            "type": "object",
+            "properties": {
+                "createdAt": {
+                    "type": "string"
+                },
+                "deletedAt": {
+                    "$ref": "#/definitions/gorm.DeletedAt"
+                },
+                "director": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "item_id": {
+                    "description": "FK para items",
+                    "type": "integer"
+                },
+                "runtime": {
+                    "description": "em minutos",
+                    "type": "integer"
+                },
+                "updatedAt": {
+                    "type": "string"
+                }
+            }
+        },
+        "github_com_rafaelc-rb_geekery-api_internal_models.MusicData": {
+            "type": "object",
+            "properties": {
+                "album": {
+                    "type": "string"
+                },
+                "artist": {
+                    "type": "string"
+                },
+                "createdAt": {
+                    "type": "string"
+                },
+                "deletedAt": {
+                    "$ref": "#/definitions/gorm.DeletedAt"
+                },
+                "duration": {
+                    "description": "Duração total do álbum em segundos",
+                    "type": "integer"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "item_id": {
+                    "description": "FK para items",
+                    "type": "integer"
+                },
+                "tracks": {
+                    "description": "Número de faixas",
+                    "type": "integer"
+                },
+                "updatedAt": {
+                    "type": "string"
+                }
+            }
+        },
+        "github_com_rafaelc-rb_geekery-api_internal_models.ProgressType": {
+            "type": "string",
+            "enum": [
+                "episodic",
+                "reading",
+                "time",
+                "percent",
+                "boolean"
+            ],
+            "x-enum-comments": {
+                "ProgressTypeBoolean": "Music - listened/play_count",
+                "ProgressTypeEpisodic": "Series, Anime - season/episode",
+                "ProgressTypePercent": "Games - percent/hours",
+                "ProgressTypeReading": "Books, Manga, Light Novels - chapter/volume/page (todos opcionais)",
+                "ProgressTypeTime": "Movies - minutes_watched"
+            },
+            "x-enum-descriptions": [
+                "Series, Anime - season/episode",
+                "Books, Manga, Light Novels - chapter/volume/page (todos opcionais)",
+                "Movies - minutes_watched",
+                "Games - percent/hours",
+                "Music - listened/play_count"
+            ],
+            "x-enum-varnames": [
+                "ProgressTypeEpisodic",
+                "ProgressTypeReading",
+                "ProgressTypeTime",
+                "ProgressTypePercent",
+                "ProgressTypeBoolean"
+            ]
+        },
+        "github_com_rafaelc-rb_geekery-api_internal_models.SeriesData": {
+            "type": "object",
+            "properties": {
+                "createdAt": {
+                    "type": "string"
+                },
+                "deletedAt": {
+                    "$ref": "#/definitions/gorm.DeletedAt"
+                },
+                "episodes": {
+                    "description": "Total de episódios",
+                    "type": "integer"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "item_id": {
+                    "description": "FK para items",
+                    "type": "integer"
+                },
+                "seasons": {
+                    "type": "integer"
+                },
+                "updatedAt": {
+                    "type": "string"
+                }
+            }
+        },
+        "github_com_rafaelc-rb_geekery-api_internal_models.Tag": {
+            "type": "object",
+            "properties": {
+                "createdAt": {
+                    "type": "string"
+                },
+                "deletedAt": {
+                    "$ref": "#/definitions/gorm.DeletedAt"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "items": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/github_com_rafaelc-rb_geekery-api_internal_models.Item"
+                    }
+                },
+                "name": {
+                    "type": "string"
+                },
+                "updatedAt": {
+                    "type": "string"
+                }
+            }
+        },
+        "github_com_rafaelc-rb_geekery-api_internal_models.User": {
+            "type": "object",
+            "properties": {
+                "createdAt": {
+                    "type": "string"
+                },
+                "deletedAt": {
+                    "$ref": "#/definitions/gorm.DeletedAt"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "updatedAt": {
+                    "type": "string"
+                },
+                "user_items": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/github_com_rafaelc-rb_geekery-api_internal_models.UserItem"
+                    }
+                }
+            }
+        },
+        "github_com_rafaelc-rb_geekery-api_internal_models.UserItem": {
+            "type": "object",
+            "properties": {
+                "completion_count": {
+                    "description": "Contador de conclusões (quantas vezes completou 100%)",
+                    "type": "integer"
+                },
+                "createdAt": {
+                    "type": "string"
+                },
+                "deletedAt": {
+                    "$ref": "#/definitions/gorm.DeletedAt"
+                },
+                "favorite": {
+                    "type": "boolean"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "item": {
+                    "$ref": "#/definitions/github_com_rafaelc-rb_geekery-api_internal_models.Item"
+                },
+                "item_id": {
+                    "type": "integer"
+                },
+                "notes": {
+                    "type": "string"
+                },
+                "progress_data": {
+                    "description": "Dados flexíveis de progresso + history",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/github_com_rafaelc-rb_geekery-api_internal_models.JSONB"
+                        }
+                    ]
+                },
+                "progress_type": {
+                    "description": "Sistema de progresso flexível",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/github_com_rafaelc-rb_geekery-api_internal_models.ProgressType"
+                        }
+                    ]
+                },
+                "rating": {
+                    "type": "number"
+                },
+                "status": {
+                    "$ref": "#/definitions/github_com_rafaelc-rb_geekery-api_internal_models.MediaStatus"
+                },
+                "updatedAt": {
+                    "type": "string"
+                },
+                "user": {
+                    "description": "Relationships",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/github_com_rafaelc-rb_geekery-api_internal_models.User"
+                        }
+                    ]
+                },
+                "user_id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "gorm.DeletedAt": {
+            "type": "object",
+            "properties": {
+                "time": {
+                    "type": "string"
+                },
+                "valid": {
+                    "description": "Valid is true if Time is not NULL",
+                    "type": "boolean"
+                }
+            }
+        },
+        "internal_handlers.CreateTagRequest": {
+            "type": "object",
+            "required": [
+                "name"
+            ],
+            "properties": {
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "internal_handlers.UpdateTagRequest": {
+            "type": "object",
+            "required": [
+                "name"
+            ],
+            "properties": {
+                "name": {
+                    "type": "string"
+                }
+            }
+        }
+    },
+    "securityDefinitions": {
+        "BearerAuth": {
+            "description": "Type \"Bearer\" followed by a space and JWT token (future implementation)",
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header"
+        }
+    },
+    "tags": [
+        {
+            "description": "Items catalog endpoints (global media library)",
+            "name": "items"
+        },
+        {
+            "description": "Personal list endpoints (user's media tracking)",
+            "name": "my-list"
+        },
+        {
+            "description": "Tags management endpoints",
+            "name": "tags"
+        }
+    ]
+}

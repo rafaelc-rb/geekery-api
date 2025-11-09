@@ -9,6 +9,7 @@ import (
 	"testing"
 
 	"github.com/gin-gonic/gin"
+	"github.com/rafaelc-rb/geekery-api/internal/dto"
 	"github.com/rafaelc-rb/geekery-api/internal/models"
 	"github.com/rafaelc-rb/geekery-api/internal/services"
 	"github.com/rafaelc-rb/geekery-api/internal/testutil"
@@ -67,8 +68,8 @@ func TestUserItemHandler_GetMyList(t *testing.T) {
 		{UserID: 1, ItemID: 2, Status: models.StatusInProgress},
 	}
 
-	mockUserItemRepo.GetByUserIDFunc = func(ctx context.Context, userID uint) ([]models.UserItem, error) {
-		return expectedItems, nil
+	mockUserItemRepo.GetByUserIDFunc = func(ctx context.Context, userID uint, params dto.PaginationParams) ([]models.UserItem, int64, error) {
+		return expectedItems, 2, nil
 	}
 
 	router := gin.New()
@@ -82,11 +83,16 @@ func TestUserItemHandler_GetMyList(t *testing.T) {
 		t.Errorf("Expected status 200, got %d", w.Code)
 	}
 
-	var items []models.UserItem
-	err := json.Unmarshal(w.Body.Bytes(), &items)
+	var response dto.PaginatedResponse
+	err := json.Unmarshal(w.Body.Bytes(), &response)
 	if err != nil {
 		t.Errorf("Failed to unmarshal response: %v", err)
 	}
+
+	// Convert data back to items
+	itemsData, _ := json.Marshal(response.Data)
+	var items []models.UserItem
+	json.Unmarshal(itemsData, &items)
 
 	if len(items) != 2 {
 		t.Errorf("Expected 2 items, got %d", len(items))

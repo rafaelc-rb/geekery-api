@@ -3,18 +3,19 @@ package testutil
 import (
 	"context"
 
+	"github.com/rafaelc-rb/geekery-api/internal/dto"
 	"github.com/rafaelc-rb/geekery-api/internal/models"
 )
 
 // MockItemRepository é um mock do ItemRepository para testes
 type MockItemRepository struct {
 	CreateFunc              func(ctx context.Context, item *models.Item) error
-	GetAllFunc              func(ctx context.Context) ([]models.Item, error)
+	GetAllFunc              func(ctx context.Context, params dto.PaginationParams) ([]models.Item, int64, error)
 	GetByIDFunc             func(ctx context.Context, id uint) (*models.Item, error)
-	GetByTypeFunc           func(ctx context.Context, mediaType models.MediaType) ([]models.Item, error)
+	GetByTypeFunc           func(ctx context.Context, mediaType models.MediaType, params dto.PaginationParams) ([]models.Item, int64, error)
 	UpdateFunc              func(ctx context.Context, item *models.Item) error
 	DeleteFunc              func(ctx context.Context, id uint) error
-	SearchByTitleFunc       func(ctx context.Context, query string) ([]models.Item, error)
+	SearchByTitleFunc       func(ctx context.Context, query string, params dto.PaginationParams) ([]models.Item, int64, error)
 	GetByExternalIDFunc     func(ctx context.Context, source, externalID string) (*models.Item, error)
 	GetByYearFunc           func(ctx context.Context, year int) ([]models.Item, error)
 	AssociateTagsFunc       func(ctx context.Context, itemID uint, tagIDs []uint) error
@@ -29,11 +30,11 @@ func (m *MockItemRepository) Create(ctx context.Context, item *models.Item) erro
 	return nil
 }
 
-func (m *MockItemRepository) GetAll(ctx context.Context) ([]models.Item, error) {
+func (m *MockItemRepository) GetAll(ctx context.Context, params dto.PaginationParams) ([]models.Item, int64, error) {
 	if m.GetAllFunc != nil {
-		return m.GetAllFunc(ctx)
+		return m.GetAllFunc(ctx, params)
 	}
-	return []models.Item{}, nil
+	return []models.Item{}, 0, nil
 }
 
 func (m *MockItemRepository) GetByID(ctx context.Context, id uint) (*models.Item, error) {
@@ -43,11 +44,11 @@ func (m *MockItemRepository) GetByID(ctx context.Context, id uint) (*models.Item
 	return &models.Item{}, nil
 }
 
-func (m *MockItemRepository) GetByType(ctx context.Context, mediaType models.MediaType) ([]models.Item, error) {
+func (m *MockItemRepository) GetByType(ctx context.Context, mediaType models.MediaType, params dto.PaginationParams) ([]models.Item, int64, error) {
 	if m.GetByTypeFunc != nil {
-		return m.GetByTypeFunc(ctx, mediaType)
+		return m.GetByTypeFunc(ctx, mediaType, params)
 	}
-	return []models.Item{}, nil
+	return []models.Item{}, 0, nil
 }
 
 func (m *MockItemRepository) Update(ctx context.Context, item *models.Item) error {
@@ -64,11 +65,11 @@ func (m *MockItemRepository) Delete(ctx context.Context, id uint) error {
 	return nil
 }
 
-func (m *MockItemRepository) SearchByTitle(ctx context.Context, query string) ([]models.Item, error) {
+func (m *MockItemRepository) SearchByTitle(ctx context.Context, query string, params dto.PaginationParams) ([]models.Item, int64, error) {
 	if m.SearchByTitleFunc != nil {
-		return m.SearchByTitleFunc(ctx, query)
+		return m.SearchByTitleFunc(ctx, query, params)
 	}
-	return []models.Item{}, nil
+	return []models.Item{}, 0, nil
 }
 
 func (m *MockItemRepository) GetByExternalID(ctx context.Context, source, externalID string) (*models.Item, error) {
@@ -109,14 +110,14 @@ func (m *MockItemRepository) CreateSpecificData(ctx context.Context, itemID uint
 // MockUserItemRepository é um mock do UserItemRepository para testes
 type MockUserItemRepository struct {
 	CreateFunc          func(ctx context.Context, userItem *models.UserItem) error
-	GetByUserIDFunc     func(ctx context.Context, userID uint) ([]models.UserItem, error)
+	GetByUserIDFunc     func(ctx context.Context, userID uint, params dto.PaginationParams) ([]models.UserItem, int64, error)
 	GetByIDFunc         func(ctx context.Context, id uint) (*models.UserItem, error)
 	GetByIDAndUserFunc  func(ctx context.Context, id, userID uint) (*models.UserItem, error)
 	UpdateFunc          func(ctx context.Context, userItem *models.UserItem) error
 	DeleteFunc          func(ctx context.Context, id uint) error
 	ExistsFunc          func(ctx context.Context, userID, itemID uint) (bool, error)
-	GetByStatusFunc     func(ctx context.Context, userID uint, status models.MediaStatus) ([]models.UserItem, error)
-	GetFavoritesFunc    func(ctx context.Context, userID uint) ([]models.UserItem, error)
+	GetByStatusFunc     func(ctx context.Context, userID uint, status models.MediaStatus, params dto.PaginationParams) ([]models.UserItem, int64, error)
+	GetFavoritesFunc    func(ctx context.Context, userID uint, params dto.PaginationParams) ([]models.UserItem, int64, error)
 	GetStatisticsFunc   func(ctx context.Context, userID uint) (map[string]int64, error)
 }
 
@@ -127,11 +128,11 @@ func (m *MockUserItemRepository) Create(ctx context.Context, userItem *models.Us
 	return nil
 }
 
-func (m *MockUserItemRepository) GetByUserID(ctx context.Context, userID uint) ([]models.UserItem, error) {
+func (m *MockUserItemRepository) GetByUserID(ctx context.Context, userID uint, params dto.PaginationParams) ([]models.UserItem, int64, error) {
 	if m.GetByUserIDFunc != nil {
-		return m.GetByUserIDFunc(ctx, userID)
+		return m.GetByUserIDFunc(ctx, userID, params)
 	}
-	return []models.UserItem{}, nil
+	return []models.UserItem{}, 0, nil
 }
 
 func (m *MockUserItemRepository) GetByID(ctx context.Context, id uint) (*models.UserItem, error) {
@@ -169,18 +170,18 @@ func (m *MockUserItemRepository) Exists(ctx context.Context, userID, itemID uint
 	return false, nil
 }
 
-func (m *MockUserItemRepository) GetByStatus(ctx context.Context, userID uint, status models.MediaStatus) ([]models.UserItem, error) {
+func (m *MockUserItemRepository) GetByStatus(ctx context.Context, userID uint, status models.MediaStatus, params dto.PaginationParams) ([]models.UserItem, int64, error) {
 	if m.GetByStatusFunc != nil {
-		return m.GetByStatusFunc(ctx, userID, status)
+		return m.GetByStatusFunc(ctx, userID, status, params)
 	}
-	return []models.UserItem{}, nil
+	return []models.UserItem{}, 0, nil
 }
 
-func (m *MockUserItemRepository) GetFavorites(ctx context.Context, userID uint) ([]models.UserItem, error) {
+func (m *MockUserItemRepository) GetFavorites(ctx context.Context, userID uint, params dto.PaginationParams) ([]models.UserItem, int64, error) {
 	if m.GetFavoritesFunc != nil {
-		return m.GetFavoritesFunc(ctx, userID)
+		return m.GetFavoritesFunc(ctx, userID, params)
 	}
-	return []models.UserItem{}, nil
+	return []models.UserItem{}, 0, nil
 }
 
 func (m *MockUserItemRepository) GetStatistics(ctx context.Context, userID uint) (map[string]int64, error) {

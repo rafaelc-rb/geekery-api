@@ -31,17 +31,17 @@ type UpdateTagRequest struct {
 	Name string `json:"name" binding:"required"`
 }
 
-// CreateTag godoc
-// @Summary Criar uma nova tag
-// @Description Cria uma nova tag para categorizar items
-// @Tags tags
-// @Accept json
-// @Produce json
-// @Param tag body CreateTagRequest true "Dados da tag"
-// @Success 201 {object} models.Tag
-// @Failure 400 {object} map[string]string
-// @Failure 500 {object} map[string]string
-// @Router /api/tags [post]
+// CreateTag cria uma nova tag
+// @Summary      Create tag
+// @Description  Create a new tag for categorizing items
+// @Tags         tags
+// @Accept       json
+// @Produce      json
+// @Param        tag  body  CreateTagRequest  true  "Tag data"
+// @Success      201  {object}  models.Tag            "Tag created successfully"
+// @Failure      400  {object}  map[string]string     "Bad request - validation error"
+// @Failure      500  {object}  map[string]string     "Internal server error"
+// @Router       /tags [post]
 func (h *TagHandler) CreateTag(c *gin.Context) {
 	ctx := c.Request.Context()
 
@@ -63,14 +63,15 @@ func (h *TagHandler) CreateTag(c *gin.Context) {
 	c.JSON(http.StatusCreated, tag)
 }
 
-// GetAllTags godoc
-// @Summary Listar todas as tags
-// @Description Retorna uma lista de todas as tags
-// @Tags tags
-// @Produce json
-// @Success 200 {array} models.Tag
-// @Failure 500 {object} map[string]string
-// @Router /api/tags [get]
+// GetAllTags retorna todas as tags
+// @Summary      Get all tags
+// @Description  Get a list of all available tags
+// @Tags         tags
+// @Accept       json
+// @Produce      json
+// @Success      200  {array}   models.Tag            "Success - returns all tags"
+// @Failure      500  {object}  map[string]string     "Internal server error"
+// @Router       /tags [get]
 func (h *TagHandler) GetAllTags(c *gin.Context) {
 	ctx := c.Request.Context()
 
@@ -83,16 +84,17 @@ func (h *TagHandler) GetAllTags(c *gin.Context) {
 	c.JSON(http.StatusOK, tags)
 }
 
-// GetTagByID godoc
-// @Summary Buscar tag por ID
-// @Description Retorna uma tag específica pelo seu ID
-// @Tags tags
-// @Produce json
-// @Param id path int true "Tag ID"
-// @Success 200 {object} models.Tag
-// @Failure 400 {object} map[string]string
-// @Failure 404 {object} map[string]string
-// @Router /api/tags/{id} [get]
+// GetTagByID retorna uma tag específica
+// @Summary      Get tag by ID
+// @Description  Get a specific tag by its ID
+// @Tags         tags
+// @Accept       json
+// @Produce      json
+// @Param        id  path  int  true  "Tag ID"
+// @Success      200  {object}  models.Tag            "Success - returns tag"
+// @Failure      400  {object}  map[string]string     "Bad request - invalid ID"
+// @Failure      404  {object}  map[string]string     "Tag not found"
+// @Router       /tags/{id} [get]
 func (h *TagHandler) GetTagByID(c *gin.Context) {
 	ctx := c.Request.Context()
 
@@ -115,18 +117,18 @@ func (h *TagHandler) GetTagByID(c *gin.Context) {
 	c.JSON(http.StatusOK, tag)
 }
 
-// UpdateTag godoc
-// @Summary Atualizar uma tag
-// @Description Atualiza os dados de uma tag existente
-// @Tags tags
-// @Accept json
-// @Produce json
-// @Param id path int true "Tag ID"
-// @Param tag body UpdateTagRequest true "Dados atualizados"
-// @Success 200 {object} models.Tag
-// @Failure 400 {object} map[string]string
-// @Failure 404 {object} map[string]string
-// @Router /api/tags/{id} [put]
+// UpdateTag atualiza uma tag existente
+// @Summary      Update tag
+// @Description  Update an existing tag's data
+// @Tags         tags
+// @Accept       json
+// @Produce      json
+// @Param        id   path  int                true  "Tag ID"
+// @Param        tag  body  UpdateTagRequest   true  "Updated tag data"
+// @Success      200  {object}  models.Tag            "Tag updated successfully"
+// @Failure      400  {object}  map[string]string     "Bad request - validation error"
+// @Failure      404  {object}  map[string]string     "Tag not found"
+// @Router       /tags/{id} [put]
 func (h *TagHandler) UpdateTag(c *gin.Context) {
 	ctx := c.Request.Context()
 
@@ -161,16 +163,17 @@ func (h *TagHandler) UpdateTag(c *gin.Context) {
 	c.JSON(http.StatusOK, updatedTag)
 }
 
-// DeleteTag godoc
-// @Summary Deletar uma tag
-// @Description Remove uma tag do banco de dados
-// @Tags tags
-// @Produce json
-// @Param id path int true "Tag ID"
-// @Success 200 {object} map[string]string
-// @Failure 400 {object} map[string]string
-// @Failure 404 {object} map[string]string
-// @Router /api/tags/{id} [delete]
+// DeleteTag remove uma tag
+// @Summary      Delete tag
+// @Description  Delete a tag from the database
+// @Tags         tags
+// @Accept       json
+// @Produce      json
+// @Param        id  path  int  true  "Tag ID"
+// @Success      200  {object}  map[string]string  "Tag deleted successfully"
+// @Failure      400  {object}  map[string]string  "Bad request - invalid ID"
+// @Failure      404  {object}  map[string]string  "Tag not found"
+// @Router       /tags/{id} [delete]
 func (h *TagHandler) DeleteTag(c *gin.Context) {
 	ctx := c.Request.Context()
 

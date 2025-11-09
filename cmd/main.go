@@ -13,7 +13,40 @@ import (
 	"github.com/rafaelc-rb/geekery-api/internal/logger"
 	"github.com/rafaelc-rb/geekery-api/internal/middleware"
 	"github.com/rafaelc-rb/geekery-api/internal/routes"
+
+	_ "github.com/rafaelc-rb/geekery-api/docs" // Swagger docs
 )
+
+// @title           Geekery API
+// @version         1.0
+// @description     A personal geek media tracker API - Track anime, movies, series, games, manga, books and music
+// @description     Features: Personal lists, progress tracking, ratings, favorites, and more
+// @termsOfService  http://swagger.io/terms/
+
+// @contact.name   Rafael C Ribeiro
+// @contact.email  support@geekery.dev
+
+// @license.name  MIT
+// @license.url   https://opensource.org/licenses/MIT
+
+// @host      localhost:8080
+// @BasePath  /api
+
+// @schemes http https
+
+// @tag.name items
+// @tag.description Items catalog endpoints (global media library)
+
+// @tag.name my-list
+// @tag.description Personal list endpoints (user's media tracking)
+
+// @tag.name tags
+// @tag.description Tags management endpoints
+
+// @securityDefinitions.apikey BearerAuth
+// @in header
+// @name Authorization
+// @description Type "Bearer" followed by a space and JWT token (future implementation)
 
 func main() {
 	// Banner

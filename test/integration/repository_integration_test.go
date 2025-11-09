@@ -4,6 +4,7 @@ import (
 	"context"
 	"testing"
 
+	"github.com/rafaelc-rb/geekery-api/internal/dto"
 	"github.com/rafaelc-rb/geekery-api/internal/models"
 	"github.com/rafaelc-rb/geekery-api/internal/repositories"
 	"github.com/rafaelc-rb/geekery-api/internal/testutil"
@@ -56,13 +57,17 @@ func TestItemRepository_Integration(t *testing.T) {
 			}
 		}
 
-		all, err := repo.GetAll(ctx)
+		params := dto.PaginationParams{Page: 1, Limit: 20}
+		all, total, err := repo.GetAll(ctx, params)
 		if err != nil {
 			t.Fatalf("Failed to get all items: %v", err)
 		}
 
 		if len(all) != 2 {
 			t.Errorf("Expected 2 items, got %d", len(all))
+		}
+		if total != 2 {
+			t.Errorf("Expected total 2, got %d", total)
 		}
 	})
 
@@ -135,13 +140,17 @@ func TestItemRepository_Integration(t *testing.T) {
 			}
 		}
 
-		results, err := repo.SearchByTitle(ctx, "attack")
+		params := dto.PaginationParams{Page: 1, Limit: 20}
+		results, total, err := repo.SearchByTitle(ctx, "attack", params)
 		if err != nil {
 			t.Fatalf("Failed to search: %v", err)
 		}
 
 		if len(results) != 1 {
 			t.Errorf("Expected 1 result, got %d", len(results))
+		}
+		if total != 1 {
+			t.Errorf("Expected total 1, got %d", total)
 		}
 
 		if len(results) > 0 && results[0].Title != "Attack on Titan" {
@@ -310,13 +319,17 @@ func TestUserItemRepository_Integration(t *testing.T) {
 			}
 		}
 
-		all, err := userItemRepo.GetByUserID(ctx, user3.ID)
+		params := dto.PaginationParams{Page: 1, Limit: 20}
+		all, total, err := userItemRepo.GetByUserID(ctx, user3.ID, params)
 		if err != nil {
 			t.Fatalf("Failed to get by user ID: %v", err)
 		}
 
 		if len(all) != 2 {
 			t.Errorf("Expected 2 user items, got %d", len(all))
+		}
+		if total != 2 {
+			t.Errorf("Expected total 2, got %d", total)
 		}
 	})
 

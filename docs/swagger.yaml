@@ -1,0 +1,998 @@
+basePath: /api
+definitions:
+  github_com_rafaelc-rb_geekery-api_internal_dto.PaginatedResponse:
+    properties:
+      data: {}
+      pagination:
+        $ref: '#/definitions/github_com_rafaelc-rb_geekery-api_internal_dto.PaginationMeta'
+    type: object
+  github_com_rafaelc-rb_geekery-api_internal_dto.PaginationMeta:
+    properties:
+      current_page:
+        type: integer
+      has_next:
+        type: boolean
+      has_previous:
+        type: boolean
+      items_per_page:
+        type: integer
+      total_items:
+        type: integer
+      total_pages:
+        type: integer
+    type: object
+  github_com_rafaelc-rb_geekery-api_internal_models.AnimeData:
+    properties:
+      createdAt:
+        type: string
+      deletedAt:
+        $ref: '#/definitions/gorm.DeletedAt'
+      episodes:
+        type: integer
+      id:
+        type: integer
+      item_id:
+        description: FK para items
+        type: integer
+      studio:
+        type: string
+      updatedAt:
+        type: string
+    type: object
+  github_com_rafaelc-rb_geekery-api_internal_models.BookData:
+    properties:
+      author:
+        type: string
+      chapters:
+        description: Total de capítulos
+        type: integer
+      createdAt:
+        type: string
+      deletedAt:
+        $ref: '#/definitions/gorm.DeletedAt'
+      id:
+        type: integer
+      item_id:
+        description: FK para items
+        type: integer
+      pages:
+        description: Total de páginas
+        type: integer
+      updatedAt:
+        type: string
+      volumes:
+        description: Total de volumes (manga/LN sempre tem, books às vezes)
+        type: integer
+    type: object
+  github_com_rafaelc-rb_geekery-api_internal_models.GameData:
+    properties:
+      average_playtime:
+        description: Horas médias para completar
+        type: integer
+      createdAt:
+        type: string
+      deletedAt:
+        $ref: '#/definitions/gorm.DeletedAt'
+      developer:
+        type: string
+      id:
+        type: integer
+      item_id:
+        description: FK para items
+        type: integer
+      platform:
+        description: PC, PS5, Switch, Xbox, etc
+        type: string
+      updatedAt:
+        type: string
+    type: object
+  github_com_rafaelc-rb_geekery-api_internal_models.Item:
+    properties:
+      anime_data:
+        allOf:
+        - $ref: '#/definitions/github_com_rafaelc-rb_geekery-api_internal_models.AnimeData'
+        description: Dados específicos por tipo (apenas um será não-nil baseado no
+          Type)
+      book_data:
+        $ref: '#/definitions/github_com_rafaelc-rb_geekery-api_internal_models.BookData'
+      cover_url:
+        type: string
+      createdAt:
+        type: string
+      deletedAt:
+        $ref: '#/definitions/gorm.DeletedAt'
+      description:
+        type: string
+      external_metadata:
+        allOf:
+        - $ref: '#/definitions/github_com_rafaelc-rb_geekery-api_internal_models.JSONB'
+        description: Metadados de APIs externas (MAL, IMDb, etc)
+      game_data:
+        $ref: '#/definitions/github_com_rafaelc-rb_geekery-api_internal_models.GameData'
+      id:
+        type: integer
+      movie_data:
+        $ref: '#/definitions/github_com_rafaelc-rb_geekery-api_internal_models.MovieData'
+      music_data:
+        $ref: '#/definitions/github_com_rafaelc-rb_geekery-api_internal_models.MusicData'
+      release_date:
+        description: Data de lançamento/estreia
+        type: string
+      series_data:
+        $ref: '#/definitions/github_com_rafaelc-rb_geekery-api_internal_models.SeriesData'
+      tags:
+        items:
+          $ref: '#/definitions/github_com_rafaelc-rb_geekery-api_internal_models.Tag'
+        type: array
+      title:
+        type: string
+      type:
+        $ref: '#/definitions/github_com_rafaelc-rb_geekery-api_internal_models.MediaType'
+      updatedAt:
+        type: string
+    type: object
+  github_com_rafaelc-rb_geekery-api_internal_models.JSONB:
+    additionalProperties: true
+    type: object
+  github_com_rafaelc-rb_geekery-api_internal_models.MediaStatus:
+    enum:
+    - planned
+    - in_progress
+    - completed
+    - paused
+    - dropped
+    type: string
+    x-enum-comments:
+      StatusCompleted: Completado/assistido/jogado/lido
+      StatusDropped: Abandonado
+      StatusInProgress: Assistindo/jogando/lendo/ouvindo
+      StatusPaused: Pausado/em espera
+      StatusPlanned: Quero assistir/jogar/ler/ouvir
+    x-enum-descriptions:
+    - Quero assistir/jogar/ler/ouvir
+    - Assistindo/jogando/lendo/ouvindo
+    - Completado/assistido/jogado/lido
+    - Pausado/em espera
+    - Abandonado
+    x-enum-varnames:
+    - StatusPlanned
+    - StatusInProgress
+    - StatusCompleted
+    - StatusPaused
+    - StatusDropped
+  github_com_rafaelc-rb_geekery-api_internal_models.MediaType:
+    enum:
+    - anime
+    - movie
+    - series
+    - game
+    - manga
+    - light_novel
+    - music
+    - book
+    type: string
+    x-enum-varnames:
+    - MediaTypeAnime
+    - MediaTypeMovie
+    - MediaTypeSeries
+    - MediaTypeGame
+    - MediaTypeManga
+    - MediaTypeLightNovel
+    - MediaTypeMusic
+    - MediaTypeBook
+  github_com_rafaelc-rb_geekery-api_internal_models.MovieData:
+    properties:
+      createdAt:
+        type: string
+      deletedAt:
+        $ref: '#/definitions/gorm.DeletedAt'
+      director:
+        type: string
+      id:
+        type: integer
+      item_id:
+        description: FK para items
+        type: integer
+      runtime:
+        description: em minutos
+        type: integer
+      updatedAt:
+        type: string
+    type: object
+  github_com_rafaelc-rb_geekery-api_internal_models.MusicData:
+    properties:
+      album:
+        type: string
+      artist:
+        type: string
+      createdAt:
+        type: string
+      deletedAt:
+        $ref: '#/definitions/gorm.DeletedAt'
+      duration:
+        description: Duração total do álbum em segundos
+        type: integer
+      id:
+        type: integer
+      item_id:
+        description: FK para items
+        type: integer
+      tracks:
+        description: Número de faixas
+        type: integer
+      updatedAt:
+        type: string
+    type: object
+  github_com_rafaelc-rb_geekery-api_internal_models.ProgressType:
+    enum:
+    - episodic
+    - reading
+    - time
+    - percent
+    - boolean
+    type: string
+    x-enum-comments:
+      ProgressTypeBoolean: Music - listened/play_count
+      ProgressTypeEpisodic: Series, Anime - season/episode
+      ProgressTypePercent: Games - percent/hours
+      ProgressTypeReading: Books, Manga, Light Novels - chapter/volume/page (todos
+        opcionais)
+      ProgressTypeTime: Movies - minutes_watched
+    x-enum-descriptions:
+    - Series, Anime - season/episode
+    - Books, Manga, Light Novels - chapter/volume/page (todos opcionais)
+    - Movies - minutes_watched
+    - Games - percent/hours
+    - Music - listened/play_count
+    x-enum-varnames:
+    - ProgressTypeEpisodic
+    - ProgressTypeReading
+    - ProgressTypeTime
+    - ProgressTypePercent
+    - ProgressTypeBoolean
+  github_com_rafaelc-rb_geekery-api_internal_models.SeriesData:
+    properties:
+      createdAt:
+        type: string
+      deletedAt:
+        $ref: '#/definitions/gorm.DeletedAt'
+      episodes:
+        description: Total de episódios
+        type: integer
+      id:
+        type: integer
+      item_id:
+        description: FK para items
+        type: integer
+      seasons:
+        type: integer
+      updatedAt:
+        type: string
+    type: object
+  github_com_rafaelc-rb_geekery-api_internal_models.Tag:
+    properties:
+      createdAt:
+        type: string
+      deletedAt:
+        $ref: '#/definitions/gorm.DeletedAt'
+      id:
+        type: integer
+      items:
+        items:
+          $ref: '#/definitions/github_com_rafaelc-rb_geekery-api_internal_models.Item'
+        type: array
+      name:
+        type: string
+      updatedAt:
+        type: string
+    type: object
+  github_com_rafaelc-rb_geekery-api_internal_models.User:
+    properties:
+      createdAt:
+        type: string
+      deletedAt:
+        $ref: '#/definitions/gorm.DeletedAt'
+      email:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      updatedAt:
+        type: string
+      user_items:
+        items:
+          $ref: '#/definitions/github_com_rafaelc-rb_geekery-api_internal_models.UserItem'
+        type: array
+    type: object
+  github_com_rafaelc-rb_geekery-api_internal_models.UserItem:
+    properties:
+      completion_count:
+        description: Contador de conclusões (quantas vezes completou 100%)
+        type: integer
+      createdAt:
+        type: string
+      deletedAt:
+        $ref: '#/definitions/gorm.DeletedAt'
+      favorite:
+        type: boolean
+      id:
+        type: integer
+      item:
+        $ref: '#/definitions/github_com_rafaelc-rb_geekery-api_internal_models.Item'
+      item_id:
+        type: integer
+      notes:
+        type: string
+      progress_data:
+        allOf:
+        - $ref: '#/definitions/github_com_rafaelc-rb_geekery-api_internal_models.JSONB'
+        description: Dados flexíveis de progresso + history
+      progress_type:
+        allOf:
+        - $ref: '#/definitions/github_com_rafaelc-rb_geekery-api_internal_models.ProgressType'
+        description: Sistema de progresso flexível
+      rating:
+        type: number
+      status:
+        $ref: '#/definitions/github_com_rafaelc-rb_geekery-api_internal_models.MediaStatus'
+      updatedAt:
+        type: string
+      user:
+        allOf:
+        - $ref: '#/definitions/github_com_rafaelc-rb_geekery-api_internal_models.User'
+        description: Relationships
+      user_id:
+        type: integer
+    type: object
+  gorm.DeletedAt:
+    properties:
+      time:
+        type: string
+      valid:
+        description: Valid is true if Time is not NULL
+        type: boolean
+    type: object
+  internal_handlers.CreateTagRequest:
+    properties:
+      name:
+        type: string
+    required:
+    - name
+    type: object
+  internal_handlers.UpdateTagRequest:
+    properties:
+      name:
+        type: string
+    required:
+    - name
+    type: object
+host: localhost:8080
+info:
+  contact:
+    email: support@geekery.dev
+    name: Rafael C Ribeiro
+  description: |-
+    A personal geek media tracker API - Track anime, movies, series, games, manga, books and music
+    Features: Personal lists, progress tracking, ratings, favorites, and more
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+  termsOfService: http://swagger.io/terms/
+  title: Geekery API
+  version: "1.0"
+paths:
+  /items:
+    get:
+      consumes:
+      - application/json
+      description: Get paginated list of all items from the global catalog
+      parameters:
+      - default: 1
+        description: Page number
+        in: query
+        minimum: 1
+        name: page
+        type: integer
+      - default: 20
+        description: Items per page
+        in: query
+        maximum: 100
+        minimum: 1
+        name: limit
+        type: integer
+      - description: Filter by media type
+        enum:
+        - anime
+        - movie
+        - series
+        - game
+        - manga
+        - light_novel
+        - music
+        - book
+        in: query
+        name: type
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success - returns paginated items
+          schema:
+            $ref: '#/definitions/github_com_rafaelc-rb_geekery-api_internal_dto.PaginatedResponse'
+        "400":
+          description: Bad request - invalid parameters
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get all items
+      tags:
+      - items
+    post:
+      consumes:
+      - application/json
+      description: Create a new item in the global catalog (admin only in the future)
+      parameters:
+      - description: Item to create
+        in: body
+        name: item
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_rafaelc-rb_geekery-api_internal_models.Item'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Item created successfully
+          schema:
+            $ref: '#/definitions/github_com_rafaelc-rb_geekery-api_internal_models.Item'
+        "400":
+          description: Bad request - validation error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Create item
+      tags:
+      - items
+  /items/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete an item from the catalog (admin only in the future)
+      parameters:
+      - description: Item ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: Item deleted successfully
+        "400":
+          description: Bad request - invalid ID
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Item not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Delete item
+      tags:
+      - items
+    get:
+      consumes:
+      - application/json
+      description: Get a specific item from the catalog by its ID
+      parameters:
+      - description: Item ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success - returns item
+          schema:
+            $ref: '#/definitions/github_com_rafaelc-rb_geekery-api_internal_models.Item'
+        "400":
+          description: Bad request - invalid ID
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Item not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get item by ID
+      tags:
+      - items
+    put:
+      consumes:
+      - application/json
+      description: Update an existing item in the catalog (admin only in the future)
+      parameters:
+      - description: Item ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Item data to update
+        in: body
+        name: item
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_rafaelc-rb_geekery-api_internal_models.Item'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Item updated successfully
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad request - validation error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Item not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Update item
+      tags:
+      - items
+  /items/search:
+    get:
+      consumes:
+      - application/json
+      description: Search items by title (case-insensitive) with pagination
+      parameters:
+      - description: Search query
+        in: query
+        name: q
+        type: string
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 20
+        description: Items per page
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success - returns matching items
+          schema:
+            $ref: '#/definitions/github_com_rafaelc-rb_geekery-api_internal_dto.PaginatedResponse'
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Search items
+      tags:
+      - items
+  /my-list:
+    get:
+      consumes:
+      - application/json
+      description: Get user's personal tracking list with pagination and filters
+      parameters:
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 20
+        description: Items per page
+        in: query
+        name: limit
+        type: integer
+      - description: Filter by status
+        enum:
+        - planned
+        - in_progress
+        - completed
+        - paused
+        - dropped
+        in: query
+        name: status
+        type: string
+      - description: Filter favorites only
+        in: query
+        name: favorite
+        type: boolean
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success - returns user's items
+          schema:
+            $ref: '#/definitions/github_com_rafaelc-rb_geekery-api_internal_dto.PaginatedResponse'
+        "400":
+          description: Bad request - invalid parameters
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get my list
+      tags:
+      - my-list
+    post:
+      consumes:
+      - application/json
+      description: Add a catalog item to user's personal tracking list
+      parameters:
+      - description: Item to add (item_id required, status optional)
+        in: body
+        name: item
+        required: true
+        schema:
+          properties:
+            item_id:
+              type: integer
+            status:
+              type: string
+          type: object
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Item added successfully
+          schema:
+            $ref: '#/definitions/github_com_rafaelc-rb_geekery-api_internal_models.UserItem'
+        "400":
+          description: Bad request - validation error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "409":
+          description: Conflict - item already in list
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Add item to my list
+      tags:
+      - my-list
+  /my-list/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Remove an item from user's tracking list
+      parameters:
+      - description: User Item ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: Item removed successfully
+        "400":
+          description: Bad request - invalid ID
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Item not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Remove from list
+      tags:
+      - my-list
+    get:
+      consumes:
+      - application/json
+      description: Get a specific item from user's list by ID
+      parameters:
+      - description: User Item ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success - returns user item
+          schema:
+            $ref: '#/definitions/github_com_rafaelc-rb_geekery-api_internal_models.UserItem'
+        "400":
+          description: Bad request - invalid ID
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Item not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get list item
+      tags:
+      - my-list
+    put:
+      consumes:
+      - application/json
+      description: Update a user's list item (status, rating, progress, etc)
+      parameters:
+      - description: User Item ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Updated item data
+        in: body
+        name: item
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_rafaelc-rb_geekery-api_internal_models.UserItem'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Item updated successfully
+          schema:
+            $ref: '#/definitions/github_com_rafaelc-rb_geekery-api_internal_models.UserItem'
+        "400":
+          description: Bad request - validation error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Item not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Update list item
+      tags:
+      - my-list
+  /my-list/stats:
+    get:
+      consumes:
+      - application/json
+      description: Get statistics about user's tracking list (totals by status, favorites
+        count)
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success - returns statistics
+          schema:
+            additionalProperties:
+              format: int64
+              type: integer
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get list statistics
+      tags:
+      - my-list
+  /tags:
+    get:
+      consumes:
+      - application/json
+      description: Get a list of all available tags
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success - returns all tags
+          schema:
+            items:
+              $ref: '#/definitions/github_com_rafaelc-rb_geekery-api_internal_models.Tag'
+            type: array
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get all tags
+      tags:
+      - tags
+    post:
+      consumes:
+      - application/json
+      description: Create a new tag for categorizing items
+      parameters:
+      - description: Tag data
+        in: body
+        name: tag
+        required: true
+        schema:
+          $ref: '#/definitions/internal_handlers.CreateTagRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Tag created successfully
+          schema:
+            $ref: '#/definitions/github_com_rafaelc-rb_geekery-api_internal_models.Tag'
+        "400":
+          description: Bad request - validation error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Create tag
+      tags:
+      - tags
+  /tags/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a tag from the database
+      parameters:
+      - description: Tag ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Tag deleted successfully
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad request - invalid ID
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Tag not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Delete tag
+      tags:
+      - tags
+    get:
+      consumes:
+      - application/json
+      description: Get a specific tag by its ID
+      parameters:
+      - description: Tag ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success - returns tag
+          schema:
+            $ref: '#/definitions/github_com_rafaelc-rb_geekery-api_internal_models.Tag'
+        "400":
+          description: Bad request - invalid ID
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Tag not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get tag by ID
+      tags:
+      - tags
+    put:
+      consumes:
+      - application/json
+      description: Update an existing tag's data
+      parameters:
+      - description: Tag ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Updated tag data
+        in: body
+        name: tag
+        required: true
+        schema:
+          $ref: '#/definitions/internal_handlers.UpdateTagRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Tag updated successfully
+          schema:
+            $ref: '#/definitions/github_com_rafaelc-rb_geekery-api_internal_models.Tag'
+        "400":
+          description: Bad request - validation error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Tag not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Update tag
+      tags:
+      - tags
+schemes:
+- http
+- https
+securityDefinitions:
+  BearerAuth:
+    description: Type "Bearer" followed by a space and JWT token (future implementation)
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"
+tags:
+- description: Items catalog endpoints (global media library)
+  name: items
+- description: Personal list endpoints (user's media tracking)
+  name: my-list
+- description: Tags management endpoints
+  name: tags

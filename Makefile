@@ -18,6 +18,11 @@ help:
 	@echo "  make dev      - Start everything (PostgreSQL + API)"
 	@echo "  make run      - Run the API (PostgreSQL must be running)"
 	@echo ""
+	@echo "Documentation:"
+	@echo "  make swagger       - Generate Swagger docs"
+	@echo "  make open-swagger  - Open Swagger UI in browser"
+	@echo "  📘 Swagger URL: http://localhost:8080/swagger/index.html"
+	@echo ""
 	@echo "Database:"
 	@echo "  make db-reset - Reset database (removes all data)"
 	@echo "  make db-verify - Test database connection"
@@ -155,3 +160,15 @@ seed:
 	@echo "🌱 Seeding database with sample data..."
 	@go run cmd/seed/main.go
 	@echo "✓ Seeding complete!"
+
+## swagger: Generate Swagger documentation
+swagger:
+	@echo "📚 Generating Swagger documentation..."
+	@swag init -g cmd/main.go -o docs --parseDependency --parseInternal
+	@echo "✓ Swagger docs generated! Access at http://localhost:8080/swagger/index.html"
+
+## open-swagger: Open Swagger UI
+open-swagger:
+	@echo "🔗 Opening Swagger UI..."
+	@open http://localhost:8080/swagger/index.html
+	@echo "✓ Swagger UI opened"

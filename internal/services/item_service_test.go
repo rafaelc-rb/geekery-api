@@ -5,6 +5,7 @@ import (
 	"errors"
 	"testing"
 
+	"github.com/rafaelc-rb/geekery-api/internal/dto"
 	"github.com/rafaelc-rb/geekery-api/internal/models"
 	"github.com/rafaelc-rb/geekery-api/internal/testutil"
 )
@@ -97,19 +98,56 @@ func TestGetAllItems_Success(t *testing.T) {
 	}
 
 	mockRepo := &testutil.MockItemRepository{
-		GetAllFunc: func(ctx context.Context) ([]models.Item, error) {
-			return expectedItems, nil
+		GetAllFunc: func(ctx context.Context, params dto.PaginationParams) ([]models.Item, int64, error) {
+			return expectedItems, 2, nil
 		},
 	}
 
 	service := NewItemService(mockRepo)
-	items, err := service.GetAllItems(ctx)
+	params := dto.PaginationParams{Page: 1, Limit: 20}
+	items, total, err := service.GetAllItems(ctx, params)
 
 	if err != nil {
 		t.Errorf("Expected no error, got %v", err)
 	}
 	if len(items) != 2 {
 		t.Errorf("Expected 2 items, got %d", len(items))
+	}
+	if total != 2 {
+		t.Errorf("Expected total 2, got %d", total)
+	}
+}
+
+func TestGetAllItems_WithPagination(t *testing.T) {
+	ctx := context.Background()
+	// Simulando página 2 com 10 items por página
+	expectedItems := []models.Item{
+		{Title: "Item 11", Type: models.MediaTypeAnime},
+		{Title: "Item 12", Type: models.MediaTypeMovie},
+	}
+
+	mockRepo := &testutil.MockItemRepository{
+		GetAllFunc: func(ctx context.Context, params dto.PaginationParams) ([]models.Item, int64, error) {
+			// Verificar que os params foram normalizados
+			if params.Page == 2 && params.Limit == 10 {
+				return expectedItems, 25, nil // 25 total items
+			}
+			return nil, 0, errors.New("unexpected params")
+		},
+	}
+
+	service := NewItemService(mockRepo)
+	params := dto.PaginationParams{Page: 2, Limit: 10}
+	items, total, err := service.GetAllItems(ctx, params)
+
+	if err != nil {
+		t.Errorf("Expected no error, got %v", err)
+	}
+	if len(items) != 2 {
+		t.Errorf("Expected 2 items, got %d", len(items))
+	}
+	if total != 25 {
+		t.Errorf("Expected total 25, got %d", total)
 	}
 }
 

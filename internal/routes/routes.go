@@ -5,6 +5,8 @@ import (
 	"github.com/rafaelc-rb/geekery-api/internal/handlers"
 	"github.com/rafaelc-rb/geekery-api/internal/repositories"
 	"github.com/rafaelc-rb/geekery-api/internal/services"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 	"gorm.io/gorm"
 )
 
@@ -17,6 +19,9 @@ func SetupRoutes(r *gin.Engine, db *gorm.DB) {
 			"message": "Geekery API is running!",
 		})
 	})
+
+	// Swagger documentation
+	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	api := r.Group("/api")
 
