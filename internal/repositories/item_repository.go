@@ -124,25 +124,34 @@ func (r *ItemRepository) GetByType(ctx context.Context, mediaType models.MediaTy
 		return nil, 0, err
 	}
 
-	// Buscar items paginados
-	err := r.db.WithContext(ctx).
-		Preload("Tags").
+	// Configurar query com Preload condicional baseado no tipo
+	// Isso evita N+1 queries ao carregar dados específicos
+	query := r.db.WithContext(ctx).Preload("Tags")
+
+	// Preload dados específicos baseado no tipo (em uma única query)
+	switch mediaType {
+	case models.MediaTypeAnime:
+		query = query.Preload("AnimeData")
+	case models.MediaTypeMovie:
+		query = query.Preload("MovieData")
+	case models.MediaTypeGame:
+		query = query.Preload("GameData")
+	case models.MediaTypeMusic:
+		query = query.Preload("MusicData")
+	case models.MediaTypeBook, models.MediaTypeManga, models.MediaTypeLightNovel:
+		query = query.Preload("BookData")
+	case models.MediaTypeSeries:
+		query = query.Preload("SeriesData")
+	}
+
+	// Buscar items paginados com dados específicos já carregados
+	err := query.
 		Where("type = ?", mediaType).
 		Limit(params.Limit).
 		Offset(params.GetOffset()).
 		Find(&items).Error
-	if err != nil {
-		return nil, 0, err
-	}
 
-	// Preload dados específicos para todos os items do tipo
-	for i := range items {
-		if err := r.preloadSpecificData(ctx, &items[i]); err != nil {
-			return nil, 0, err
-		}
-	}
-
-	return items, total, nil
+	return items, total, err
 }
 
 // Update atualiza um item existente no catálogo

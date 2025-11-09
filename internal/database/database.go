@@ -38,6 +38,16 @@ func ConnectDB(cfg *config.Config) (*gorm.DB, error) {
 		return nil, fmt.Errorf("failed to run migrations: %w", err)
 	}
 
+	// Criar índices otimizados
+	if err := CreateOptimizedIndexes(db); err != nil {
+		log.Printf("Warning: Failed to create optimized indexes: %v", err)
+	}
+
+	// Tentar criar índice de full-text search (requer pg_trgm)
+	if err := CreateFullTextSearchIndex(db); err != nil {
+		log.Printf("Warning: Failed to create full-text search index: %v", err)
+	}
+
 	DB = db
 	return db, nil
 }
