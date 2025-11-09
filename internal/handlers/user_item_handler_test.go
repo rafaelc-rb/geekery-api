@@ -24,6 +24,14 @@ func setupUserItemHandler() (*UserItemHandler, *testutil.MockUserItemRepository,
 	return handler, mockUserItemRepo, mockItemRepo
 }
 
+// mockAuthMiddleware injects a mock userID into the context for testing
+func mockAuthMiddleware(userID uint) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		c.Set("userID", userID)
+		c.Next()
+	}
+}
+
 func TestUserItemHandler_AddToList(t *testing.T) {
 	handler, mockUserItemRepo, mockItemRepo := setupUserItemHandler()
 
@@ -42,6 +50,7 @@ func TestUserItemHandler_AddToList(t *testing.T) {
 	}
 
 	router := gin.New()
+	router.Use(mockAuthMiddleware(1)) // Mock authenticated user with ID 1
 	router.POST("/my-list", handler.AddToList)
 
 	payload := map[string]interface{}{
@@ -73,6 +82,7 @@ func TestUserItemHandler_GetMyList(t *testing.T) {
 	}
 
 	router := gin.New()
+	router.Use(mockAuthMiddleware(1)) // Mock authenticated user with ID 1
 	router.GET("/my-list", handler.GetMyList)
 
 	req, _ := http.NewRequest("GET", "/my-list", nil)
@@ -119,6 +129,7 @@ func TestUserItemHandler_UpdateListItem(t *testing.T) {
 	}
 
 	router := gin.New()
+	router.Use(mockAuthMiddleware(1)) // Mock authenticated user with ID 1
 	router.PUT("/my-list/:id", handler.UpdateListItem)
 
 	payload := map[string]interface{}{
@@ -151,6 +162,7 @@ func TestUserItemHandler_RemoveFromList(t *testing.T) {
 	}
 
 	router := gin.New()
+	router.Use(mockAuthMiddleware(1)) // Mock authenticated user with ID 1
 	router.DELETE("/my-list/:id", handler.RemoveFromList)
 
 	req, _ := http.NewRequest("DELETE", "/my-list/1", nil)
@@ -177,6 +189,7 @@ func TestUserItemHandler_GetStatistics(t *testing.T) {
 	}
 
 	router := gin.New()
+	router.Use(mockAuthMiddleware(1)) // Mock authenticated user with ID 1
 	router.GET("/my-list/stats", handler.GetStatistics)
 
 	req, _ := http.NewRequest("GET", "/my-list/stats", nil)

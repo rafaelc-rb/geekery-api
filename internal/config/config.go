@@ -9,14 +9,15 @@ import (
 )
 
 type Config struct {
-	DBHost     string
-	DBPort     string
-	DBUser     string
-	DBPassword string
-	DBName     string
-	ServerPort string
+	DBHost      string
+	DBPort      string
+	DBUser      string
+	DBPassword  string
+	DBName      string
+	ServerPort  string
 	Environment string
-	LogLevel   string
+	LogLevel    string
+	JWTSecret   string
 }
 
 var AppConfig *Config
@@ -37,6 +38,7 @@ func LoadConfig() (*Config, error) {
 		ServerPort:  getEnv("SERVER_PORT", "8080"),
 		Environment: getEnv("ENV", "development"),
 		LogLevel:    getEnv("LOG_LEVEL", "info"),
+		JWTSecret:   getEnv("JWT_SECRET", ""),
 	}
 
 	// Validar campos obrigatórios
@@ -64,6 +66,12 @@ func (c *Config) validate() error {
 	}
 	if c.DBName == "" {
 		return fmt.Errorf("DB_NAME is required")
+	}
+	if c.JWTSecret == "" {
+		return fmt.Errorf("JWT_SECRET is required")
+	}
+	if len(c.JWTSecret) < 32 {
+		return fmt.Errorf("JWT_SECRET must be at least 32 characters")
 	}
 	return nil
 }

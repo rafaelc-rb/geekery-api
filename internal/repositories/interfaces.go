@@ -35,6 +35,16 @@ type TagRepositoryInterface interface {
 	GetTagsByIDs(ctx context.Context, ids []uint) ([]models.Tag, error)
 }
 
+// UserRepositoryInterface define os métodos do repositório de users
+type UserRepositoryInterface interface {
+	Create(ctx context.Context, user *models.User) error
+	GetByID(ctx context.Context, id uint) (*models.User, error)
+	GetByEmail(ctx context.Context, email string) (*models.User, error)
+	GetByUsername(ctx context.Context, username string) (*models.User, error)
+	Update(ctx context.Context, user *models.User) error
+	Delete(ctx context.Context, id uint) error
+}
+
 // UserItemRepositoryInterface define os métodos do repositório de user_items
 type UserItemRepositoryInterface interface {
 	Create(ctx context.Context, userItem *models.UserItem) error

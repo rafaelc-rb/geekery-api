@@ -1,7 +1,11 @@
 package routes
 
 import (
+	"time"
+
 	"github.com/gin-gonic/gin"
+	"github.com/rafaelc-rb/geekery-api/internal/auth"
+	"github.com/rafaelc-rb/geekery-api/internal/config"
 	"github.com/rafaelc-rb/geekery-api/internal/handlers"
 	"github.com/rafaelc-rb/geekery-api/internal/repositories"
 	"github.com/rafaelc-rb/geekery-api/internal/services"
@@ -26,11 +30,18 @@ func SetupRoutes(r *gin.Engine, db *gorm.DB) {
 	api := r.Group("/api")
 
 	// ========================================
+	// JWT Manager
+	// ========================================
+	cfg := config.AppConfig
+	jwtManager := auth.NewJWTManager(cfg.JWTSecret, 24*time.Hour) // Token válido por 24 horas
+
+	// ========================================
 	// Repositórios
 	// ========================================
 	itemRepo := repositories.NewItemRepository(db)
 	tagRepo := repositories.NewTagRepository(db)
 	userItemRepo := repositories.NewUserItemRepository(db)
+	userRepo := repositories.NewUserRepository(db)
 
 	// ========================================
 	// Serviços
@@ -38,6 +49,7 @@ func SetupRoutes(r *gin.Engine, db *gorm.DB) {
 	itemService := services.NewItemService(itemRepo)
 	tagService := services.NewTagService(tagRepo)
 	userItemService := services.NewUserItemService(userItemRepo, itemRepo)
+	authService := services.NewAuthService(userRepo, jwtManager)
 
 	// ========================================
 	// Handlers
@@ -45,6 +57,7 @@ func SetupRoutes(r *gin.Engine, db *gorm.DB) {
 	itemHandler := handlers.NewItemHandler(itemService)
 	tagHandler := handlers.NewTagHandler(tagService)
 	userItemHandler := handlers.NewUserItemHandler(userItemService)
+	authHandler := handlers.NewAuthHandler(authService)
 
 	// ========================================
 	// Rotas Públicas - Catálogo de Items
@@ -74,10 +87,20 @@ func SetupRoutes(r *gin.Engine, db *gorm.DB) {
 	}
 
 	// ========================================
-	// Rotas Autenticadas - Lista Pessoal do Usuário
-	// (Usando UserID mock = 1 por enquanto)
+	// Rotas de Autenticação (Públicas)
+	// ========================================
+	authRoutes := api.Group("/auth")
+	{
+		authRoutes.POST("/register", authHandler.Register) // POST /api/auth/register
+		authRoutes.POST("/login", authHandler.Login)       // POST /api/auth/login
+	}
+
+	// ========================================
+	// Rotas Protegidas - Lista Pessoal do Usuário
+	// Requer autenticação JWT
 	// ========================================
 	myListRoutes := api.Group("/my-list")
+	myListRoutes.Use(auth.AuthMiddleware(jwtManager)) // Proteger todas as rotas deste grupo
 	{
 		myListRoutes.POST("", userItemHandler.AddToList)              // POST /api/my-list
 		myListRoutes.GET("", userItemHandler.GetMyList)               // GET /api/my-list?status=watching&favorite=true

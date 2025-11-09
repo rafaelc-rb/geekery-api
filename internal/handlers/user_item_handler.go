@@ -19,10 +19,13 @@ func NewUserItemHandler(service *services.UserItemService) *UserItemHandler {
 	return &UserItemHandler{service: service}
 }
 
-// getMockUserID retorna o userID mock para desenvolvimento
-func getMockUserID() uint {
-	// TODO: Substituir por autenticação real via JWT
-	return 1
+// getUserID extrai o userID do contexto (injetado pelo middleware de autenticação)
+func getUserID(c *gin.Context) uint {
+	userID, exists := c.Get("userID")
+	if !exists {
+		return 0
+	}
+	return userID.(uint)
 }
 
 // AddToList adiciona um item à lista do usuário
@@ -38,7 +41,7 @@ func getMockUserID() uint {
 // @Router       /my-list [post]
 func (h *UserItemHandler) AddToList(c *gin.Context) {
 	ctx := c.Request.Context()
-	userID := getMockUserID()
+	userID := getUserID(c)
 
 	var input struct {
 		ItemID uint               `json:"item_id" binding:"required"`
@@ -84,7 +87,7 @@ func (h *UserItemHandler) AddToList(c *gin.Context) {
 // @Router       /my-list [get]
 func (h *UserItemHandler) GetMyList(c *gin.Context) {
 	ctx := c.Request.Context()
-	userID := getMockUserID()
+	userID := getUserID(c)
 
 	// Parse parâmetros de paginação
 	var params dto.PaginationParams
@@ -151,7 +154,7 @@ func (h *UserItemHandler) GetMyList(c *gin.Context) {
 // @Router       /my-list/{id} [get]
 func (h *UserItemHandler) GetMyListItem(c *gin.Context) {
 	ctx := c.Request.Context()
-	userID := getMockUserID()
+	userID := getUserID(c)
 
 	id, err := strconv.ParseUint(c.Param("id"), 10, 64)
 	if err != nil {
@@ -182,7 +185,7 @@ func (h *UserItemHandler) GetMyListItem(c *gin.Context) {
 // @Router       /my-list/{id} [put]
 func (h *UserItemHandler) UpdateListItem(c *gin.Context) {
 	ctx := c.Request.Context()
-	userID := getMockUserID()
+	userID := getUserID(c)
 
 	id, err := strconv.ParseUint(c.Param("id"), 10, 64)
 	if err != nil {
@@ -237,7 +240,7 @@ func (h *UserItemHandler) UpdateListItem(c *gin.Context) {
 // @Router       /my-list/{id} [delete]
 func (h *UserItemHandler) RemoveFromList(c *gin.Context) {
 	ctx := c.Request.Context()
-	userID := getMockUserID()
+	userID := getUserID(c)
 
 	id, err := strconv.ParseUint(c.Param("id"), 10, 64)
 	if err != nil {
@@ -264,7 +267,7 @@ func (h *UserItemHandler) RemoveFromList(c *gin.Context) {
 // @Router       /my-list/stats [get]
 func (h *UserItemHandler) GetStatistics(c *gin.Context) {
 	ctx := c.Request.Context()
-	userID := getMockUserID()
+	userID := getUserID(c)
 
 	stats, err := h.service.GetStatistics(ctx, userID)
 	if err != nil {

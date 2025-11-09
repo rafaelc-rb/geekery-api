@@ -2,7 +2,7 @@
 
 # Variables
 APP_NAME=geekery-api
-DOCKER_COMPOSE=cd deploy && docker-compose
+DOCKER_COMPOSE=cd deploy && docker-compose --env-file ../.env
 
 # Default target
 .DEFAULT_GOAL := help

@@ -1,5 +1,22 @@
 basePath: /api
 definitions:
+  github_com_rafaelc-rb_geekery-api_internal_dto.AuthResponse:
+    properties:
+      token:
+        type: string
+      user:
+        $ref: '#/definitions/github_com_rafaelc-rb_geekery-api_internal_dto.UserInfo'
+    type: object
+  github_com_rafaelc-rb_geekery-api_internal_dto.LoginRequest:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    required:
+    - email
+    - password
+    type: object
   github_com_rafaelc-rb_geekery-api_internal_dto.PaginatedResponse:
     properties:
       data: {}
@@ -20,6 +37,40 @@ definitions:
         type: integer
       total_pages:
         type: integer
+    type: object
+  github_com_rafaelc-rb_geekery-api_internal_dto.RegisterRequest:
+    properties:
+      email:
+        type: string
+      name:
+        maxLength: 100
+        minLength: 1
+        type: string
+      password:
+        minLength: 8
+        type: string
+      username:
+        maxLength: 30
+        minLength: 3
+        type: string
+    required:
+    - email
+    - name
+    - password
+    - username
+    type: object
+  github_com_rafaelc-rb_geekery-api_internal_dto.UserInfo:
+    properties:
+      created_at:
+        type: string
+      email:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      username:
+        type: string
     type: object
   github_com_rafaelc-rb_geekery-api_internal_models.AnimeData:
     properties:
@@ -304,6 +355,8 @@ definitions:
         items:
           $ref: '#/definitions/github_com_rafaelc-rb_geekery-api_internal_models.UserItem'
         type: array
+      username:
+        type: string
     type: object
   github_com_rafaelc-rb_geekery-api_internal_models.UserItem:
     properties:
@@ -379,6 +432,74 @@ info:
   title: Geekery API
   version: "1.0"
 paths:
+  /auth/login:
+    post:
+      consumes:
+      - application/json
+      description: Authenticate user and return JWT token
+      parameters:
+      - description: Login credentials
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_rafaelc-rb_geekery-api_internal_dto.LoginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Login successful
+          schema:
+            $ref: '#/definitions/github_com_rafaelc-rb_geekery-api_internal_dto.AuthResponse'
+        "400":
+          description: Bad request - validation error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Unauthorized - invalid credentials
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Login
+      tags:
+      - auth
+  /auth/register:
+    post:
+      consumes:
+      - application/json
+      description: Create a new user account
+      parameters:
+      - description: Registration data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_rafaelc-rb_geekery-api_internal_dto.RegisterRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: User registered successfully
+          schema:
+            $ref: '#/definitions/github_com_rafaelc-rb_geekery-api_internal_dto.AuthResponse'
+        "400":
+          description: Bad request - validation error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "409":
+          description: Conflict - email or username already exists
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Register a new user
+      tags:
+      - auth
   /items:
     get:
       consumes:
