@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"net/http"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/rafaelc-rb/geekery-api/internal/dto"
@@ -229,4 +230,143 @@ func (h *ItemHandler) DeleteItem(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusNoContent, nil)
+}
+
+// ImportAnime importa múltiplos animes de um arquivo CSV
+// @Summary      Import anime items
+// @Description  Import multiple anime items from CSV file
+// @Tags         items
+// @Accept       multipart/form-data
+// @Produce      json
+// @Param        file  formData  file  true  "CSV file with anime data"
+// @Success      200  {object}  dto.ImportResult  "Import completed"
+// @Failure      400  {object}  map[string]string  "Bad request"
+// @Router       /items/import/anime [post]
+func (h *ItemHandler) ImportAnime(c *gin.Context) {
+	h.importByType(c, models.MediaTypeAnime)
+}
+
+// ImportManga importa múltiplos mangas de um arquivo CSV
+// @Summary      Import manga items
+// @Description  Import multiple manga items from CSV file
+// @Tags         items
+// @Accept       multipart/form-data
+// @Produce      json
+// @Param        file  formData  file  true  "CSV file with manga data"
+// @Success      200  {object}  dto.ImportResult  "Import completed"
+// @Failure      400  {object}  map[string]string  "Bad request"
+// @Router       /items/import/manga [post]
+func (h *ItemHandler) ImportManga(c *gin.Context) {
+	h.importByType(c, models.MediaTypeManga)
+}
+
+// ImportMovie importa múltiplos filmes de um arquivo CSV
+// @Summary      Import movie items
+// @Description  Import multiple movie items from CSV file
+// @Tags         items
+// @Accept       multipart/form-data
+// @Produce      json
+// @Param        file  formData  file  true  "CSV file with movie data"
+// @Success      200  {object}  dto.ImportResult  "Import completed"
+// @Failure      400  {object}  map[string]string  "Bad request"
+// @Router       /items/import/movie [post]
+func (h *ItemHandler) ImportMovie(c *gin.Context) {
+	h.importByType(c, models.MediaTypeMovie)
+}
+
+// ImportSeries importa múltiplas séries de um arquivo CSV
+// @Summary      Import series items
+// @Description  Import multiple series items from CSV file
+// @Tags         items
+// @Accept       multipart/form-data
+// @Produce      json
+// @Param        file  formData  file  true  "CSV file with series data"
+// @Success      200  {object}  dto.ImportResult  "Import completed"
+// @Failure      400  {object}  map[string]string  "Bad request"
+// @Router       /items/import/series [post]
+func (h *ItemHandler) ImportSeries(c *gin.Context) {
+	h.importByType(c, models.MediaTypeSeries)
+}
+
+// ImportGame importa múltiplos games de um arquivo CSV
+// @Summary      Import game items
+// @Description  Import multiple game items from CSV file
+// @Tags         items
+// @Accept       multipart/form-data
+// @Produce      json
+// @Param        file  formData  file  true  "CSV file with game data"
+// @Success      200  {object}  dto.ImportResult  "Import completed"
+// @Failure      400  {object}  map[string]string  "Bad request"
+// @Router       /items/import/game [post]
+func (h *ItemHandler) ImportGame(c *gin.Context) {
+	h.importByType(c, models.MediaTypeGame)
+}
+
+// ImportBook importa múltiplos livros de um arquivo CSV
+// @Summary      Import book items
+// @Description  Import multiple book items from CSV file
+// @Tags         items
+// @Accept       multipart/form-data
+// @Produce      json
+// @Param        file  formData  file  true  "CSV file with book data"
+// @Success      200  {object}  dto.ImportResult  "Import completed"
+// @Failure      400  {object}  map[string]string  "Bad request"
+// @Router       /items/import/book [post]
+func (h *ItemHandler) ImportBook(c *gin.Context) {
+	h.importByType(c, models.MediaTypeBook)
+}
+
+// ImportMusic importa múltiplas músicas de um arquivo CSV
+// @Summary      Import music items
+// @Description  Import multiple music items from CSV file
+// @Tags         items
+// @Accept       multipart/form-data
+// @Produce      json
+// @Param        file  formData  file  true  "CSV file with music data"
+// @Success      200  {object}  dto.ImportResult  "Import completed"
+// @Failure      400  {object}  map[string]string  "Bad request"
+// @Router       /items/import/music [post]
+func (h *ItemHandler) ImportMusic(c *gin.Context) {
+	h.importByType(c, models.MediaTypeMusic)
+}
+
+// importByType é o handler genérico de import por tipo
+func (h *ItemHandler) importByType(c *gin.Context, mediaType models.MediaType) {
+	ctx := c.Request.Context()
+
+	// Receber arquivo
+	file, err := c.FormFile("file")
+	if err != nil {
+		respondError(c, http.StatusBadRequest, dto.ErrCodeValidation, "CSV file is required")
+		return
+	}
+
+	// Validar extensão
+	if !strings.HasSuffix(strings.ToLower(file.Filename), ".csv") {
+		respondError(c, http.StatusBadRequest, dto.ErrCodeValidation, "File must be a .csv file")
+		return
+	}
+
+	// Validar tamanho (max 10MB)
+	if file.Size > 10*1024*1024 {
+		respondError(c, http.StatusBadRequest, dto.ErrCodeValidation, "File size must be less than 10MB")
+		return
+	}
+
+	// Abrir arquivo
+	src, err := file.Open()
+	if err != nil {
+		respondInternalError(c, err)
+		return
+	}
+	defer src.Close()
+
+	// Processar no service
+	result, err := h.service.ImportItemsFromCSV(ctx, src, mediaType)
+	if err != nil {
+		respondError(c, http.StatusBadRequest, dto.ErrCodeValidation, err.Error())
+		return
+	}
+
+	respondSuccess(c, http.StatusOK, result)
 }

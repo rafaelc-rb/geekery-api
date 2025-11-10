@@ -72,6 +72,15 @@ func SetupRoutes(r *gin.Engine, db *gorm.DB) {
 		itemsRoutes.POST("", itemHandler.CreateItem)           // POST /api/items
 		itemsRoutes.PUT("/:id", itemHandler.UpdateItem)        // PUT /api/items/1
 		itemsRoutes.DELETE("/:id", itemHandler.DeleteItem)     // DELETE /api/items/1
+
+		// Import endpoints
+		itemsRoutes.POST("/import/anime", itemHandler.ImportAnime)     // POST /api/items/import/anime
+		itemsRoutes.POST("/import/manga", itemHandler.ImportManga)     // POST /api/items/import/manga
+		itemsRoutes.POST("/import/movie", itemHandler.ImportMovie)     // POST /api/items/import/movie
+		itemsRoutes.POST("/import/series", itemHandler.ImportSeries)   // POST /api/items/import/series
+		itemsRoutes.POST("/import/game", itemHandler.ImportGame)       // POST /api/items/import/game
+		itemsRoutes.POST("/import/book", itemHandler.ImportBook)       // POST /api/items/import/book
+		itemsRoutes.POST("/import/music", itemHandler.ImportMusic)     // POST /api/items/import/music
 	}
 
 	// ========================================

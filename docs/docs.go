@@ -25,7 +25,7 @@ const docTemplate = `{
     "paths": {
         "/auth/login": {
             "post": {
-                "description": "Authenticate user and return JWT token",
+                "description": "Authenticate user with username or email and return JWT token",
                 "consumes": [
                     "application/json"
                 ],
@@ -38,7 +38,7 @@ const docTemplate = `{
                 "summary": "Login",
                 "parameters": [
                     {
-                        "description": "Login credentials",
+                        "description": "Login credentials (username or email)",
                         "name": "request",
                         "in": "body",
                         "required": true,
@@ -234,6 +234,293 @@ const docTemplate = `{
                     },
                     "400": {
                         "description": "Bad request - validation error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/items/import/anime": {
+            "post": {
+                "description": "Import multiple anime items from CSV file",
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "items"
+                ],
+                "summary": "Import anime items",
+                "parameters": [
+                    {
+                        "type": "file",
+                        "description": "CSV file with anime data",
+                        "name": "file",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Import completed",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_rafaelc-rb_geekery-api_internal_dto.ImportResult"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/items/import/book": {
+            "post": {
+                "description": "Import multiple book items from CSV file",
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "items"
+                ],
+                "summary": "Import book items",
+                "parameters": [
+                    {
+                        "type": "file",
+                        "description": "CSV file with book data",
+                        "name": "file",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Import completed",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_rafaelc-rb_geekery-api_internal_dto.ImportResult"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/items/import/game": {
+            "post": {
+                "description": "Import multiple game items from CSV file",
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "items"
+                ],
+                "summary": "Import game items",
+                "parameters": [
+                    {
+                        "type": "file",
+                        "description": "CSV file with game data",
+                        "name": "file",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Import completed",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_rafaelc-rb_geekery-api_internal_dto.ImportResult"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/items/import/manga": {
+            "post": {
+                "description": "Import multiple manga items from CSV file",
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "items"
+                ],
+                "summary": "Import manga items",
+                "parameters": [
+                    {
+                        "type": "file",
+                        "description": "CSV file with manga data",
+                        "name": "file",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Import completed",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_rafaelc-rb_geekery-api_internal_dto.ImportResult"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/items/import/movie": {
+            "post": {
+                "description": "Import multiple movie items from CSV file",
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "items"
+                ],
+                "summary": "Import movie items",
+                "parameters": [
+                    {
+                        "type": "file",
+                        "description": "CSV file with movie data",
+                        "name": "file",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Import completed",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_rafaelc-rb_geekery-api_internal_dto.ImportResult"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/items/import/music": {
+            "post": {
+                "description": "Import multiple music items from CSV file",
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "items"
+                ],
+                "summary": "Import music items",
+                "parameters": [
+                    {
+                        "type": "file",
+                        "description": "CSV file with music data",
+                        "name": "file",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Import completed",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_rafaelc-rb_geekery-api_internal_dto.ImportResult"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/items/import/series": {
+            "post": {
+                "description": "Import multiple series items from CSV file",
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "items"
+                ],
+                "summary": "Import series items",
+                "parameters": [
+                    {
+                        "type": "file",
+                        "description": "CSV file with series data",
+                        "name": "file",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Import completed",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_rafaelc-rb_geekery-api_internal_dto.ImportResult"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
                         "schema": {
                             "type": "object",
                             "additionalProperties": {
@@ -1031,17 +1318,58 @@ const docTemplate = `{
                 }
             }
         },
+        "github_com_rafaelc-rb_geekery-api_internal_dto.ImportError": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string"
+                },
+                "line": {
+                    "type": "integer"
+                },
+                "title": {
+                    "type": "string"
+                }
+            }
+        },
+        "github_com_rafaelc-rb_geekery-api_internal_dto.ImportResult": {
+            "type": "object",
+            "properties": {
+                "errors": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/github_com_rafaelc-rb_geekery-api_internal_dto.ImportError"
+                    }
+                },
+                "failed": {
+                    "type": "integer"
+                },
+                "imported": {
+                    "type": "integer"
+                },
+                "media_type": {
+                    "type": "string"
+                },
+                "success": {
+                    "type": "boolean"
+                },
+                "total_lines": {
+                    "type": "integer"
+                }
+            }
+        },
         "github_com_rafaelc-rb_geekery-api_internal_dto.LoginRequest": {
             "type": "object",
             "required": [
-                "email",
-                "password"
+                "password",
+                "username"
             ],
             "properties": {
-                "email": {
+                "password": {
                     "type": "string"
                 },
-                "password": {
+                "username": {
+                    "description": "Aceita username ou email",
                     "type": "string"
                 }
             }

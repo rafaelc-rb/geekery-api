@@ -7,15 +7,42 @@ definitions:
       user:
         $ref: '#/definitions/github_com_rafaelc-rb_geekery-api_internal_dto.UserInfo'
     type: object
+  github_com_rafaelc-rb_geekery-api_internal_dto.ImportError:
+    properties:
+      error:
+        type: string
+      line:
+        type: integer
+      title:
+        type: string
+    type: object
+  github_com_rafaelc-rb_geekery-api_internal_dto.ImportResult:
+    properties:
+      errors:
+        items:
+          $ref: '#/definitions/github_com_rafaelc-rb_geekery-api_internal_dto.ImportError'
+        type: array
+      failed:
+        type: integer
+      imported:
+        type: integer
+      media_type:
+        type: string
+      success:
+        type: boolean
+      total_lines:
+        type: integer
+    type: object
   github_com_rafaelc-rb_geekery-api_internal_dto.LoginRequest:
     properties:
-      email:
-        type: string
       password:
         type: string
+      username:
+        description: Aceita username ou email
+        type: string
     required:
-    - email
     - password
+    - username
     type: object
   github_com_rafaelc-rb_geekery-api_internal_dto.PaginatedResponse:
     properties:
@@ -436,9 +463,9 @@ paths:
     post:
       consumes:
       - application/json
-      description: Authenticate user and return JWT token
+      description: Authenticate user with username or email and return JWT token
       parameters:
-      - description: Login credentials
+      - description: Login credentials (username or email)
         in: body
         name: request
         required: true
@@ -682,6 +709,195 @@ paths:
               type: string
             type: object
       summary: Update item
+      tags:
+      - items
+  /items/import/anime:
+    post:
+      consumes:
+      - multipart/form-data
+      description: Import multiple anime items from CSV file
+      parameters:
+      - description: CSV file with anime data
+        in: formData
+        name: file
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Import completed
+          schema:
+            $ref: '#/definitions/github_com_rafaelc-rb_geekery-api_internal_dto.ImportResult'
+        "400":
+          description: Bad request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Import anime items
+      tags:
+      - items
+  /items/import/book:
+    post:
+      consumes:
+      - multipart/form-data
+      description: Import multiple book items from CSV file
+      parameters:
+      - description: CSV file with book data
+        in: formData
+        name: file
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Import completed
+          schema:
+            $ref: '#/definitions/github_com_rafaelc-rb_geekery-api_internal_dto.ImportResult'
+        "400":
+          description: Bad request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Import book items
+      tags:
+      - items
+  /items/import/game:
+    post:
+      consumes:
+      - multipart/form-data
+      description: Import multiple game items from CSV file
+      parameters:
+      - description: CSV file with game data
+        in: formData
+        name: file
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Import completed
+          schema:
+            $ref: '#/definitions/github_com_rafaelc-rb_geekery-api_internal_dto.ImportResult'
+        "400":
+          description: Bad request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Import game items
+      tags:
+      - items
+  /items/import/manga:
+    post:
+      consumes:
+      - multipart/form-data
+      description: Import multiple manga items from CSV file
+      parameters:
+      - description: CSV file with manga data
+        in: formData
+        name: file
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Import completed
+          schema:
+            $ref: '#/definitions/github_com_rafaelc-rb_geekery-api_internal_dto.ImportResult'
+        "400":
+          description: Bad request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Import manga items
+      tags:
+      - items
+  /items/import/movie:
+    post:
+      consumes:
+      - multipart/form-data
+      description: Import multiple movie items from CSV file
+      parameters:
+      - description: CSV file with movie data
+        in: formData
+        name: file
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Import completed
+          schema:
+            $ref: '#/definitions/github_com_rafaelc-rb_geekery-api_internal_dto.ImportResult'
+        "400":
+          description: Bad request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Import movie items
+      tags:
+      - items
+  /items/import/music:
+    post:
+      consumes:
+      - multipart/form-data
+      description: Import multiple music items from CSV file
+      parameters:
+      - description: CSV file with music data
+        in: formData
+        name: file
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Import completed
+          schema:
+            $ref: '#/definitions/github_com_rafaelc-rb_geekery-api_internal_dto.ImportResult'
+        "400":
+          description: Bad request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Import music items
+      tags:
+      - items
+  /items/import/series:
+    post:
+      consumes:
+      - multipart/form-data
+      description: Import multiple series items from CSV file
+      parameters:
+      - description: CSV file with series data
+        in: formData
+        name: file
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Import completed
+          schema:
+            $ref: '#/definitions/github_com_rafaelc-rb_geekery-api_internal_dto.ImportResult'
+        "400":
+          description: Bad request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Import series items
       tags:
       - items
   /items/search:
