@@ -149,7 +149,8 @@ func (h *ItemHandler) CreateItem(c *gin.Context) {
 
 	var input struct {
 		models.Item
-		TagIDs []uint `json:"tag_ids"`
+		TagIDs   []uint   `json:"tag_ids"`   // IDs de tags existentes
+		TagNames []string `json:"tags"`      // Nomes de tags (criadas automaticamente)
 	}
 
 	if err := validateAndBind(c, &input); err != nil {
@@ -157,7 +158,7 @@ func (h *ItemHandler) CreateItem(c *gin.Context) {
 		return
 	}
 
-	if err := h.service.CreateItem(ctx, &input.Item, input.TagIDs); err != nil {
+	if err := h.service.CreateItem(ctx, &input.Item, input.TagIDs, input.TagNames); err != nil {
 		respondError(c, http.StatusBadRequest, dto.ErrCodeValidation, err.Error())
 		return
 	}
@@ -188,7 +189,8 @@ func (h *ItemHandler) UpdateItem(c *gin.Context) {
 
 	var input struct {
 		models.Item
-		TagIDs []uint `json:"tag_ids"`
+		TagIDs   []uint   `json:"tag_ids"`   // IDs de tags existentes
+		TagNames []string `json:"tags"`      // Nomes de tags (criadas automaticamente)
 	}
 
 	if err := validateAndBind(c, &input); err != nil {
@@ -196,7 +198,7 @@ func (h *ItemHandler) UpdateItem(c *gin.Context) {
 		return
 	}
 
-	if err := h.service.UpdateItem(ctx, id, &input.Item, input.TagIDs); err != nil {
+	if err := h.service.UpdateItem(ctx, id, &input.Item, input.TagIDs, input.TagNames); err != nil {
 		respondError(c, http.StatusBadRequest, dto.ErrCodeValidation, err.Error())
 		return
 	}

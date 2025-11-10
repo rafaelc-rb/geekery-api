@@ -21,15 +21,16 @@ func TestCreateItem_Success(t *testing.T) {
 			return nil
 		},
 	}
+	mockTagRepo := &testutil.MockTagRepository{}
 
-	service := NewItemService(mockRepo)
+	service := NewItemService(mockRepo, mockTagRepo)
 
 	item := &models.Item{
 		Title: "Test Item",
 		Type:  models.MediaTypeAnime,
 	}
 
-	err := service.CreateItem(ctx, item, []uint{1, 2})
+	err := service.CreateItem(ctx, item, []uint{1, 2}, nil)
 
 	if err != nil {
 		t.Errorf("Expected no error, got %v", err)
@@ -42,14 +43,15 @@ func TestCreateItem_Success(t *testing.T) {
 func TestCreateItem_ValidationError(t *testing.T) {
 	ctx := context.Background()
 	mockRepo := &testutil.MockItemRepository{}
-	service := NewItemService(mockRepo)
+	mockTagRepo := &testutil.MockTagRepository{}
+	service := NewItemService(mockRepo, mockTagRepo)
 
 	item := &models.Item{
 		Title: "", // Invalid: empty title
 		Type:  models.MediaTypeAnime,
 	}
 
-	err := service.CreateItem(ctx, item, nil)
+	err := service.CreateItem(ctx, item, nil, nil)
 
 	if err == nil {
 		t.Error("Expected validation error, got nil")
@@ -71,7 +73,8 @@ func TestCreateItemWithSpecificData_Success(t *testing.T) {
 		},
 	}
 
-	service := NewItemService(mockRepo)
+	mockTagRepo := &testutil.MockTagRepository{}
+	service := NewItemService(mockRepo, mockTagRepo)
 
 	item := &models.Item{
 		Title: "Attack on Titan",
@@ -83,7 +86,7 @@ func TestCreateItemWithSpecificData_Success(t *testing.T) {
 		Studio:   "MAPPA",
 	}
 
-	err := service.CreateItemWithSpecificData(ctx, item, animeData, []uint{1})
+	err := service.CreateItemWithSpecificData(ctx, item, animeData, []uint{1}, nil)
 
 	if err != nil {
 		t.Errorf("Expected no error, got %v", err)
@@ -103,7 +106,8 @@ func TestGetAllItems_Success(t *testing.T) {
 		},
 	}
 
-	service := NewItemService(mockRepo)
+	mockTagRepo := &testutil.MockTagRepository{}
+	service := NewItemService(mockRepo, mockTagRepo)
 	params := dto.PaginationParams{Page: 1, Limit: 20}
 	items, total, err := service.GetAllItems(ctx, params)
 
@@ -136,7 +140,8 @@ func TestGetAllItems_WithPagination(t *testing.T) {
 		},
 	}
 
-	service := NewItemService(mockRepo)
+	mockTagRepo := &testutil.MockTagRepository{}
+	service := NewItemService(mockRepo, mockTagRepo)
 	params := dto.PaginationParams{Page: 2, Limit: 10}
 	items, total, err := service.GetAllItems(ctx, params)
 
@@ -165,7 +170,8 @@ func TestGetItemByID_Success(t *testing.T) {
 		},
 	}
 
-	service := NewItemService(mockRepo)
+	mockTagRepo := &testutil.MockTagRepository{}
+	service := NewItemService(mockRepo, mockTagRepo)
 	item, err := service.GetItemByID(ctx, 1)
 
 	if err != nil {
@@ -184,7 +190,8 @@ func TestGetItemByID_NotFound(t *testing.T) {
 		},
 	}
 
-	service := NewItemService(mockRepo)
+	mockTagRepo := &testutil.MockTagRepository{}
+	service := NewItemService(mockRepo, mockTagRepo)
 	_, err := service.GetItemByID(ctx, 999)
 
 	if err == nil {
@@ -212,14 +219,15 @@ func TestUpdateItem_Success(t *testing.T) {
 		},
 	}
 
-	service := NewItemService(mockRepo)
+	mockTagRepo := &testutil.MockTagRepository{}
+	service := NewItemService(mockRepo, mockTagRepo)
 
 	updatedItem := &models.Item{
 		Title: "New Title",
 		Type:  models.MediaTypeAnime,
 	}
 
-	err := service.UpdateItem(ctx, 1, updatedItem, []uint{1, 2})
+	err := service.UpdateItem(ctx, 1, updatedItem, []uint{1, 2}, nil)
 
 	if err != nil {
 		t.Errorf("Expected no error, got %v", err)
@@ -234,7 +242,8 @@ func TestDeleteItem_Success(t *testing.T) {
 		},
 	}
 
-	service := NewItemService(mockRepo)
+	mockTagRepo := &testutil.MockTagRepository{}
+	service := NewItemService(mockRepo, mockTagRepo)
 	err := service.DeleteItem(ctx, 1)
 
 	if err != nil {

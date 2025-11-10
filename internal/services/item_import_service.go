@@ -123,7 +123,6 @@ func (s *ItemService) createItemWithTags(ctx context.Context, item *models.Item,
 
 	// Associar tags (find or create)
 	if len(tagNames) > 0 {
-		// Buscar IDs das tags (criando se necessário)
 		tagIDs := []uint{}
 		for _, name := range tagNames {
 			name = strings.ToLower(strings.TrimSpace(name))
@@ -131,9 +130,12 @@ func (s *ItemService) createItemWithTags(ctx context.Context, item *models.Item,
 				continue
 			}
 
-			// Isso será feito via TagService no futuro, mas por ora vamos usar o repositório diretamente
-			// Para simplificar, vamos apenas associar sem criar
-			// TODO: Implementar criação automática de tags
+			// Find or create tag
+			tag := &models.Tag{Name: name}
+			if err := s.tagRepo.FindOrCreate(ctx, tag); err != nil {
+				return fmt.Errorf("failed to find/create tag '%s': %w", name, err)
+			}
+			tagIDs = append(tagIDs, tag.ID)
 		}
 
 		if len(tagIDs) > 0 {

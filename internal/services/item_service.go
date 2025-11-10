@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"strings"
 
 	"github.com/rafaelc-rb/geekery-api/internal/dto"
 	"github.com/rafaelc-rb/geekery-api/internal/models"
@@ -13,17 +14,19 @@ import (
 
 type ItemService struct {
 	itemRepo repositories.ItemRepositoryInterface
+	tagRepo  repositories.TagRepositoryInterface
 }
 
 // NewItemService cria uma nova instância do serviço de items (catálogo global)
-func NewItemService(itemRepo repositories.ItemRepositoryInterface) *ItemService {
+func NewItemService(itemRepo repositories.ItemRepositoryInterface, tagRepo repositories.TagRepositoryInterface) *ItemService {
 	return &ItemService{
 		itemRepo: itemRepo,
+		tagRepo:  tagRepo,
 	}
 }
 
 // CreateItem cria um novo item no catálogo global (admin apenas)
-func (s *ItemService) CreateItem(ctx context.Context, item *models.Item, tagIDs []uint) error {
+func (s *ItemService) CreateItem(ctx context.Context, item *models.Item, tagIDs []uint, tagNames []string) error {
 	// Validar
 	if err := item.Validate(); err != nil {
 		return err
@@ -32,6 +35,15 @@ func (s *ItemService) CreateItem(ctx context.Context, item *models.Item, tagIDs 
 	// Criar o item base primeiro
 	if err := s.itemRepo.Create(ctx, item); err != nil {
 		return fmt.Errorf("failed to create item: %w", err)
+	}
+
+	// Processar tags por nome (find or create)
+	if len(tagNames) > 0 {
+		createdTagIDs, err := s.findOrCreateTags(ctx, tagNames)
+		if err != nil {
+			return err
+		}
+		tagIDs = append(tagIDs, createdTagIDs...)
 	}
 
 	// Associar tags se fornecidas
@@ -45,7 +57,7 @@ func (s *ItemService) CreateItem(ctx context.Context, item *models.Item, tagIDs 
 }
 
 // CreateItemWithSpecificData cria um item com dados específicos baseado no tipo
-func (s *ItemService) CreateItemWithSpecificData(ctx context.Context, item *models.Item, specificData interface{}, tagIDs []uint) error {
+func (s *ItemService) CreateItemWithSpecificData(ctx context.Context, item *models.Item, specificData interface{}, tagIDs []uint, tagNames []string) error {
 	// Validar item base
 	if err := item.Validate(); err != nil {
 		return err
@@ -61,6 +73,15 @@ func (s *ItemService) CreateItemWithSpecificData(ctx context.Context, item *mode
 		if err := s.itemRepo.CreateSpecificData(ctx, item.ID, item.Type, specificData); err != nil {
 			return fmt.Errorf("failed to create specific data: %w", err)
 		}
+	}
+
+	// Processar tags por nome (find or create)
+	if len(tagNames) > 0 {
+		createdTagIDs, err := s.findOrCreateTags(ctx, tagNames)
+		if err != nil {
+			return err
+		}
+		tagIDs = append(tagIDs, createdTagIDs...)
 	}
 
 	// Associar tags
@@ -107,7 +128,7 @@ func (s *ItemService) SearchItems(ctx context.Context, query string, params dto.
 }
 
 // UpdateItem atualiza um item do catálogo (admin apenas)
-func (s *ItemService) UpdateItem(ctx context.Context, id uint, updatedItem *models.Item, tagIDs []uint) error {
+func (s *ItemService) UpdateItem(ctx context.Context, id uint, updatedItem *models.Item, tagIDs []uint, tagNames []string) error {
 	// Verificar se existe
 	existingItem, err := s.itemRepo.GetByID(ctx, id)
 	if err != nil {
@@ -135,8 +156,17 @@ func (s *ItemService) UpdateItem(ctx context.Context, id uint, updatedItem *mode
 		return fmt.Errorf("failed to update item: %w", err)
 	}
 
+	// Processar tags por nome (find or create)
+	if len(tagNames) > 0 {
+		createdTagIDs, err := s.findOrCreateTags(ctx, tagNames)
+		if err != nil {
+			return err
+		}
+		tagIDs = append(tagIDs, createdTagIDs...)
+	}
+
 	// Atualizar tags se fornecidas
-	if tagIDs != nil {
+	if len(tagIDs) > 0 {
 		if err := s.itemRepo.AssociateTags(ctx, id, tagIDs); err != nil {
 			return fmt.Errorf("failed to update tags: %w", err)
 		}
@@ -154,6 +184,24 @@ func (s *ItemService) DeleteItem(ctx context.Context, id uint) error {
 		return fmt.Errorf("failed to delete item: %w", err)
 	}
 	return nil
+}
+
+// findOrCreateTags busca ou cria tags pelo nome e retorna seus IDs
+func (s *ItemService) findOrCreateTags(ctx context.Context, tagNames []string) ([]uint, error) {
+	tagIDs := []uint{}
+	for _, name := range tagNames {
+		name = strings.ToLower(strings.TrimSpace(name))
+		if name == "" {
+			continue
+		}
+
+		tag := &models.Tag{Name: name}
+		if err := s.tagRepo.FindOrCreate(ctx, tag); err != nil {
+			return nil, fmt.Errorf("failed to find/create tag '%s': %w", name, err)
+		}
+		tagIDs = append(tagIDs, tag.ID)
+	}
+	return tagIDs, nil
 }
 
 // AssociateTags associa tags a um item do catálogo

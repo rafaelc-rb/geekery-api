@@ -46,7 +46,7 @@ func SetupRoutes(r *gin.Engine, db *gorm.DB) {
 	// ========================================
 	// Serviços
 	// ========================================
-	itemService := services.NewItemService(itemRepo)
+	itemService := services.NewItemService(itemRepo, tagRepo)
 	tagService := services.NewTagService(tagRepo)
 	userItemService := services.NewUserItemService(userItemRepo, itemRepo)
 	authService := services.NewAuthService(userRepo, jwtManager)

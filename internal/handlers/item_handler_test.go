@@ -17,7 +17,8 @@ import (
 
 func setupItemHandler() (*ItemHandler, *testutil.MockItemRepository) {
 	mockRepo := &testutil.MockItemRepository{}
-	service := services.NewItemService(mockRepo)
+	mockTagRepo := &testutil.MockTagRepository{}
+	service := services.NewItemService(mockRepo, mockTagRepo)
 	handler := NewItemHandler(service)
 	gin.SetMode(gin.TestMode)
 	return handler, mockRepo
