@@ -44,7 +44,7 @@ func (s *AuthService) Register(ctx context.Context, email, username, password, n
 	if err == nil {
 		return nil, ErrEmailAlreadyExists
 	}
-	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
+	if !errors.Is(err, gorm.ErrRecordNotFound) {
 		return nil, fmt.Errorf("failed to check email: %w", err)
 	}
 
@@ -53,7 +53,7 @@ func (s *AuthService) Register(ctx context.Context, email, username, password, n
 	if err == nil {
 		return nil, ErrUsernameAlreadyExists
 	}
-	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
+	if !errors.Is(err, gorm.ErrRecordNotFound) {
 		return nil, fmt.Errorf("failed to check username: %w", err)
 	}
 

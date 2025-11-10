@@ -12,7 +12,6 @@ import (
 
 	"github.com/rafaelc-rb/geekery-api/internal/dto"
 	"github.com/rafaelc-rb/geekery-api/internal/models"
-	"gorm.io/gorm"
 )
 
 // ImportItemsFromCSV importa múltiplos items de um arquivo CSV
@@ -465,91 +464,4 @@ func parseMusicData(headers, record []string) (*models.MusicData, error) {
 	}
 
 	return data, nil
-}
-
-// createItemInTransaction cria um item com dados específicos dentro de uma transação
-func (s *ItemService) createItemInTransaction(ctx context.Context, tx *gorm.DB, item *models.Item, specificData interface{}, tagNames []string) error {
-	// Validar item
-	if err := item.Validate(); err != nil {
-		return err
-	}
-
-	// Criar item base
-	if err := tx.WithContext(ctx).Create(item).Error; err != nil {
-		return fmt.Errorf("failed to create item: %w", err)
-	}
-
-	// Criar dados específicos
-	if specificData != nil {
-		if err := createSpecificDataInTransaction(ctx, tx, item.ID, item.Type, specificData); err != nil {
-			return fmt.Errorf("failed to create specific data: %w", err)
-		}
-	}
-
-	// Associar tags (find or create)
-	if len(tagNames) > 0 {
-		var tags []models.Tag
-		for _, name := range tagNames {
-			name = strings.ToLower(strings.TrimSpace(name))
-			if name == "" {
-				continue
-			}
-
-			tag := models.Tag{Name: name}
-			if err := tx.WithContext(ctx).Where("name = ?", name).FirstOrCreate(&tag).Error; err != nil {
-				return fmt.Errorf("failed to find or create tag '%s': %w", name, err)
-			}
-			tags = append(tags, tag)
-		}
-
-		if len(tags) > 0 {
-			if err := tx.WithContext(ctx).Model(item).Association("Tags").Replace(tags); err != nil {
-				return fmt.Errorf("failed to associate tags: %w", err)
-			}
-		}
-	}
-
-	return nil
-}
-
-// createSpecificDataInTransaction cria dados específicos dentro de uma transação
-func createSpecificDataInTransaction(ctx context.Context, tx *gorm.DB, itemID uint, mediaType models.MediaType, data interface{}) error {
-	switch mediaType {
-	case models.MediaTypeAnime:
-		if animeData, ok := data.(*models.AnimeData); ok {
-			animeData.ItemID = itemID
-			return tx.WithContext(ctx).Create(animeData).Error
-		}
-	case models.MediaTypeManga:
-		if bookData, ok := data.(*models.BookData); ok {
-			bookData.ItemID = itemID
-			return tx.WithContext(ctx).Create(bookData).Error
-		}
-	case models.MediaTypeMovie:
-		if movieData, ok := data.(*models.MovieData); ok {
-			movieData.ItemID = itemID
-			return tx.WithContext(ctx).Create(movieData).Error
-		}
-	case models.MediaTypeSeries:
-		if seriesData, ok := data.(*models.SeriesData); ok {
-			seriesData.ItemID = itemID
-			return tx.WithContext(ctx).Create(seriesData).Error
-		}
-	case models.MediaTypeGame:
-		if gameData, ok := data.(*models.GameData); ok {
-			gameData.ItemID = itemID
-			return tx.WithContext(ctx).Create(gameData).Error
-		}
-	case models.MediaTypeBook, models.MediaTypeLightNovel:
-		if bookData, ok := data.(*models.BookData); ok {
-			bookData.ItemID = itemID
-			return tx.WithContext(ctx).Create(bookData).Error
-		}
-	case models.MediaTypeMusic:
-		if musicData, ok := data.(*models.MusicData); ok {
-			musicData.ItemID = itemID
-			return tx.WithContext(ctx).Create(musicData).Error
-		}
-	}
-	return nil
 }

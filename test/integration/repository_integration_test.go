@@ -300,8 +300,12 @@ func TestUserItemRepository_Integration(t *testing.T) {
 		// Recreate items
 		item2a := &models.Item{Title: "Item 2a", Type: models.MediaTypeAnime}
 		item2b := &models.Item{Title: "Item 2b", Type: models.MediaTypeMovie}
-		itemRepo.Create(ctx, item2a)
-		itemRepo.Create(ctx, item2b)
+		if err := itemRepo.Create(ctx, item2a); err != nil {
+			t.Fatalf("Failed to create item2a: %v", err)
+		}
+		if err := itemRepo.Create(ctx, item2b); err != nil {
+			t.Fatalf("Failed to create item2b: %v", err)
+		}
 
 		// Recreate user
 		user3 := &models.User{Name: "testuser3", Email: "test3@example.com"}
@@ -337,7 +341,9 @@ func TestUserItemRepository_Integration(t *testing.T) {
 		testutil.CleanupTestDB(t, db)
 
 		item3 := &models.Item{Title: "Item 3", Type: models.MediaTypeAnime}
-		itemRepo.Create(ctx, item3)
+		if err := itemRepo.Create(ctx, item3); err != nil {
+			t.Fatalf("Failed to create item3: %v", err)
+		}
 
 		user4 := &models.User{Name: "testuser4", Email: "test4@example.com"}
 		db.Create(user4)
@@ -357,7 +363,9 @@ func TestUserItemRepository_Integration(t *testing.T) {
 			Status:       models.StatusCompleted,
 			ProgressType: models.ProgressTypeEpisodic,
 		}
-		userItemRepo.Create(ctx, userItem)
+		if err := userItemRepo.Create(ctx, userItem); err != nil {
+			t.Fatalf("Failed to create userItem: %v", err)
+		}
 
 		exists, err = userItemRepo.Exists(ctx, user4.ID, item3.ID)
 		if err != nil {
@@ -376,9 +384,15 @@ func TestUserItemRepository_Integration(t *testing.T) {
 		item4a := &models.Item{Title: "Item 4a", Type: models.MediaTypeAnime}
 		item4b := &models.Item{Title: "Item 4b", Type: models.MediaTypeMovie}
 		item4c := &models.Item{Title: "Item 4c", Type: models.MediaTypeSeries}
-		itemRepo.Create(ctx, item4a)
-		itemRepo.Create(ctx, item4b)
-		itemRepo.Create(ctx, item4c)
+		if err := itemRepo.Create(ctx, item4a); err != nil {
+			t.Fatalf("Failed to create item4a: %v", err)
+		}
+		if err := itemRepo.Create(ctx, item4b); err != nil {
+			t.Fatalf("Failed to create item4b: %v", err)
+		}
+		if err := itemRepo.Create(ctx, item4c); err != nil {
+			t.Fatalf("Failed to create item4c: %v", err)
+		}
 
 		user5 := &models.User{Name: "testuser5", Email: "test5@example.com"}
 		db.Create(user5)

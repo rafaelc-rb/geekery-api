@@ -102,7 +102,9 @@ func TestUserItemHandler_GetMyList(t *testing.T) {
 	// Convert data back to items
 	itemsData, _ := json.Marshal(response.Data)
 	var items []models.UserItem
-	json.Unmarshal(itemsData, &items)
+	if err := json.Unmarshal(itemsData, &items); err != nil {
+		t.Fatalf("Failed to unmarshal items: %v", err)
+	}
 
 	if len(items) != 2 {
 		t.Errorf("Expected 2 items, got %d", len(items))

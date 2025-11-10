@@ -361,7 +361,12 @@ func (h *ItemHandler) importByType(c *gin.Context, mediaType models.MediaType) {
 		respondInternalError(c, err)
 		return
 	}
-	defer src.Close()
+	defer func() {
+		if closeErr := src.Close(); closeErr != nil {
+			// Log error but don't fail the request
+			_ = closeErr
+		}
+	}()
 
 	// Processar no service
 	result, err := h.service.ImportItemsFromCSV(ctx, src, mediaType)
