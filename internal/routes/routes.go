@@ -75,12 +75,12 @@ func SetupRoutes(r *gin.Engine, db *gorm.DB) {
 
 		// Import endpoints
 		itemsRoutes.POST("/import/anime", itemHandler.ImportAnime)     // POST /api/items/import/anime
-		itemsRoutes.POST("/import/manga", itemHandler.ImportManga)     // POST /api/items/import/manga
+		itemsRoutes.POST("/import/comic", itemHandler.ImportComic)     // POST /api/items/import/comic
+		itemsRoutes.POST("/import/novel", itemHandler.ImportNovel)     // POST /api/items/import/novel
 		itemsRoutes.POST("/import/movie", itemHandler.ImportMovie)     // POST /api/items/import/movie
 		itemsRoutes.POST("/import/series", itemHandler.ImportSeries)   // POST /api/items/import/series
 		itemsRoutes.POST("/import/game", itemHandler.ImportGame)       // POST /api/items/import/game
 		itemsRoutes.POST("/import/book", itemHandler.ImportBook)       // POST /api/items/import/book
-		itemsRoutes.POST("/import/music", itemHandler.ImportMusic)     // POST /api/items/import/music
 	}
 
 	// ========================================

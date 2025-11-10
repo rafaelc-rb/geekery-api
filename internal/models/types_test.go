@@ -14,9 +14,8 @@ func TestMediaType_IsValid(t *testing.T) {
 		{"movie_valid", MediaTypeMovie, true},
 		{"series_valid", MediaTypeSeries, true},
 		{"game_valid", MediaTypeGame, true},
-		{"manga_valid", MediaTypeManga, true},
-		{"light_novel_valid", MediaTypeLightNovel, true},
-		{"music_valid", MediaTypeMusic, true},
+		{"comic_valid", MediaTypeComic, true},
+		{"novel_valid", MediaTypeNovel, true},
 		{"book_valid", MediaTypeBook, true},
 		{"invalid_type", MediaType("invalid"), false},
 		{"empty_type", MediaType(""), false},
@@ -90,12 +89,11 @@ func TestGetDefaultProgressType(t *testing.T) {
 	}{
 		{"anime_episodic", MediaTypeAnime, ProgressTypeEpisodic},
 		{"series_episodic", MediaTypeSeries, ProgressTypeEpisodic},
-		{"manga_reading", MediaTypeManga, ProgressTypeReading},
-		{"light_novel_reading", MediaTypeLightNovel, ProgressTypeReading},
+		{"comic_reading", MediaTypeComic, ProgressTypeReading},
+		{"novel_reading", MediaTypeNovel, ProgressTypeReading},
 		{"book_reading", MediaTypeBook, ProgressTypeReading},
 		{"movie_time", MediaTypeMovie, ProgressTypeTime},
 		{"game_percent", MediaTypeGame, ProgressTypePercent},
-		{"music_boolean", MediaTypeMusic, ProgressTypeBoolean},
 		{"unknown_boolean", MediaType("unknown"), ProgressTypeBoolean},
 	}
 

@@ -326,9 +326,9 @@ const docTemplate = `{
                 }
             }
         },
-        "/items/import/game": {
+        "/items/import/comic": {
             "post": {
-                "description": "Import multiple game items from CSV file",
+                "description": "Import multiple comic items from CSV file",
                 "consumes": [
                     "multipart/form-data"
                 ],
@@ -338,11 +338,11 @@ const docTemplate = `{
                 "tags": [
                     "items"
                 ],
-                "summary": "Import game items",
+                "summary": "Import comic items",
                 "parameters": [
                     {
                         "type": "file",
-                        "description": "CSV file with game data",
+                        "description": "CSV file with comic data",
                         "name": "file",
                         "in": "formData",
                         "required": true
@@ -367,9 +367,9 @@ const docTemplate = `{
                 }
             }
         },
-        "/items/import/manga": {
+        "/items/import/game": {
             "post": {
-                "description": "Import multiple manga items from CSV file",
+                "description": "Import multiple game items from CSV file",
                 "consumes": [
                     "multipart/form-data"
                 ],
@@ -379,11 +379,11 @@ const docTemplate = `{
                 "tags": [
                     "items"
                 ],
-                "summary": "Import manga items",
+                "summary": "Import game items",
                 "parameters": [
                     {
                         "type": "file",
-                        "description": "CSV file with manga data",
+                        "description": "CSV file with game data",
                         "name": "file",
                         "in": "formData",
                         "required": true
@@ -449,9 +449,9 @@ const docTemplate = `{
                 }
             }
         },
-        "/items/import/music": {
+        "/items/import/novel": {
             "post": {
-                "description": "Import multiple music items from CSV file",
+                "description": "Import multiple novel items from CSV file",
                 "consumes": [
                     "multipart/form-data"
                 ],
@@ -461,11 +461,11 @@ const docTemplate = `{
                 "tags": [
                     "items"
                 ],
-                "summary": "Import music items",
+                "summary": "Import novel items",
                 "parameters": [
                     {
                         "type": "file",
-                        "description": "CSV file with music data",
+                        "description": "CSV file with novel data",
                         "name": "file",
                         "in": "formData",
                         "required": true
@@ -1497,6 +1497,10 @@ const docTemplate = `{
                 "deleted_at": {
                     "$ref": "#/definitions/gorm.DeletedAt"
                 },
+                "format": {
+                    "description": "Subtipo: manga, manhwa, light_novel, web_novel, etc",
+                    "type": "string"
+                },
                 "id": {
                     "type": "integer"
                 },
@@ -1508,11 +1512,15 @@ const docTemplate = `{
                     "description": "Total de páginas",
                     "type": "integer"
                 },
+                "publisher": {
+                    "description": "Editora/publisher",
+                    "type": "string"
+                },
                 "updated_at": {
                     "type": "string"
                 },
                 "volumes": {
-                    "description": "Total de volumes (manga/LN sempre tem, books às vezes)",
+                    "description": "Total de volumes (comic/novel sempre tem, books às vezes)",
                     "type": "integer"
                 }
             }
@@ -1592,9 +1600,6 @@ const docTemplate = `{
                 "movie_data": {
                     "$ref": "#/definitions/github_com_rafaelc-rb_geekery-api_internal_models.MovieData"
                 },
-                "music_data": {
-                    "$ref": "#/definitions/github_com_rafaelc-rb_geekery-api_internal_models.MusicData"
-                },
                 "release_date": {
                     "description": "Data de lançamento/estreia",
                     "type": "string"
@@ -1661,9 +1666,8 @@ const docTemplate = `{
                 "movie",
                 "series",
                 "game",
-                "manga",
-                "light_novel",
-                "music",
+                "comic",
+                "novel",
                 "book"
             ],
             "x-enum-varnames": [
@@ -1671,9 +1675,8 @@ const docTemplate = `{
                 "MediaTypeMovie",
                 "MediaTypeSeries",
                 "MediaTypeGame",
-                "MediaTypeManga",
-                "MediaTypeLightNovel",
-                "MediaTypeMusic",
+                "MediaTypeComic",
+                "MediaTypeNovel",
                 "MediaTypeBook"
             ]
         },
@@ -1698,41 +1701,6 @@ const docTemplate = `{
                 },
                 "runtime": {
                     "description": "em minutos",
-                    "type": "integer"
-                },
-                "updated_at": {
-                    "type": "string"
-                }
-            }
-        },
-        "github_com_rafaelc-rb_geekery-api_internal_models.MusicData": {
-            "type": "object",
-            "properties": {
-                "album": {
-                    "type": "string"
-                },
-                "artist": {
-                    "type": "string"
-                },
-                "created_at": {
-                    "type": "string"
-                },
-                "deleted_at": {
-                    "$ref": "#/definitions/gorm.DeletedAt"
-                },
-                "duration": {
-                    "description": "Duração total do álbum em segundos",
-                    "type": "integer"
-                },
-                "id": {
-                    "type": "integer"
-                },
-                "item_id": {
-                    "description": "FK para items",
-                    "type": "integer"
-                },
-                "tracks": {
-                    "description": "Número de faixas",
                     "type": "integer"
                 },
                 "updated_at": {
@@ -1983,7 +1951,7 @@ var SwaggerInfo = &swag.Spec{
 	BasePath:         "/api",
 	Schemes:          []string{"http", "https"},
 	Title:            "Geekery API",
-	Description:      "A personal geek media tracker API - Track anime, movies, series, games, manga, books and music\nFeatures: Personal lists, progress tracking, ratings, favorites, and more",
+	Description:      "A personal geek media tracker API - Track anime, movies, series, games, comics, novels, and books\nFeatures: Personal lists, progress tracking, ratings, favorites, and more",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
 	LeftDelim:        "{{",

@@ -65,7 +65,6 @@ func CleanupTestDB(t *testing.T, db *gorm.DB) {
 		&models.SeriesData{},
 		&models.GameData{},
 		&models.BookData{},
-		&models.MusicData{},
 		&models.Item{},
 		&models.Tag{},
 		&models.User{},
@@ -89,7 +88,6 @@ func MigrateTestDB(db *gorm.DB) error {
 		&models.SeriesData{},
 		&models.GameData{},
 		&models.BookData{},
-		&models.MusicData{},
 		&models.UserItem{},
 	)
 }

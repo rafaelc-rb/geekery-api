@@ -4,14 +4,13 @@ package models
 type MediaType string
 
 const (
-	MediaTypeAnime      MediaType = "anime"
-	MediaTypeMovie      MediaType = "movie"
-	MediaTypeSeries     MediaType = "series"
-	MediaTypeGame       MediaType = "game"
-	MediaTypeManga      MediaType = "manga"
-	MediaTypeLightNovel MediaType = "light_novel"
-	MediaTypeMusic      MediaType = "music"
-	MediaTypeBook       MediaType = "book"
+	MediaTypeAnime  MediaType = "anime"
+	MediaTypeMovie  MediaType = "movie"
+	MediaTypeSeries MediaType = "series"
+	MediaTypeGame   MediaType = "game"
+	MediaTypeComic  MediaType = "comic"
+	MediaTypeNovel  MediaType = "novel"
+	MediaTypeBook   MediaType = "book"
 )
 
 // ValidMediaTypes lista todos os tipos de mídia válidos
@@ -20,9 +19,8 @@ var ValidMediaTypes = []MediaType{
 	MediaTypeMovie,
 	MediaTypeSeries,
 	MediaTypeGame,
-	MediaTypeManga,
-	MediaTypeLightNovel,
-	MediaTypeMusic,
+	MediaTypeComic,
+	MediaTypeNovel,
 	MediaTypeBook,
 }
 
@@ -118,14 +116,12 @@ func GetDefaultProgressType(mediaType MediaType) ProgressType {
 	switch mediaType {
 	case MediaTypeAnime, MediaTypeSeries:
 		return ProgressTypeEpisodic
-	case MediaTypeManga, MediaTypeLightNovel, MediaTypeBook:
+	case MediaTypeComic, MediaTypeNovel, MediaTypeBook:
 		return ProgressTypeReading
 	case MediaTypeMovie:
 		return ProgressTypeTime
 	case MediaTypeGame:
 		return ProgressTypePercent
-	case MediaTypeMusic:
-		return ProgressTypeBoolean
 	default:
 		return ProgressTypeBoolean
 	}

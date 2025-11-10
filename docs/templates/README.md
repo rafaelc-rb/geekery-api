@@ -8,8 +8,11 @@ Templates para importação em massa de items via CSV.
 # Importar anime
 curl -X POST http://localhost:8080/api/items/import/anime -F "file=@anime.csv"
 
-# Importar manga
-curl -X POST http://localhost:8080/api/items/import/manga -F "file=@manga.csv"
+# Importar comics
+curl -X POST http://localhost:8080/api/items/import/comic -F "file=@comic.csv"
+
+# Importar novels
+curl -X POST http://localhost:8080/api/items/import/novel -F "file=@novel.csv"
 ```
 
 ## 📋 Templates e Endpoints
@@ -28,8 +31,8 @@ curl -X POST http://localhost:8080/api/items/import/manga -F "file=@manga.csv"
 | `studio`            | ✅ Sim       | String               | MAPPA                   |
 | `external_metadata` | ❌ Não       | source:id\|source:id | mal:16498\|anilist:1234 |
 
-### 📖 Manga
-**Endpoint:** `POST /api/items/import/manga`
+### 📖 Comic (Manga, Manhwa, Webtoon)
+**Endpoint:** `POST /api/items/import/comic`
 
 | Campo               | Obrigatório | Formato              | Exemplo                    |
 | ------------------- | ----------- | -------------------- | -------------------------- |
@@ -41,7 +44,26 @@ curl -X POST http://localhost:8080/api/items/import/manga -F "file=@manga.csv"
 | `chapters`          | ✅ Sim       | Number               | 1100                       |
 | `volumes`           | ❌ Não       | Number               | 108                        |
 | `author`            | ✅ Sim       | String               | Eiichiro Oda               |
+| `format`            | ✅ Sim       | String               | manga / manhwa / webtoon   |
+| `publisher`         | ❌ Não       | String               | Shueisha                   |
 | `external_metadata` | ❌ Não       | source:id\|source:id | mal:13\|anilist:30013      |
+
+### 📚 Novel (Light Novel, Web Novel)
+**Endpoint:** `POST /api/items/import/novel`
+
+| Campo               | Obrigatório | Formato              | Exemplo                      |
+| ------------------- | ----------- | -------------------- | ---------------------------- |
+| `title`             | ✅ Sim       | String               | Sword Art Online             |
+| `description`       | ❌ Não       | String               | VRMMORPG adventure...        |
+| `release_date`      | ❌ Não       | YYYY-MM-DD           | 2009-04-10                   |
+| `cover_url`         | ❌ Não       | URL                  | https://...                  |
+| `tags`              | ❌ Não       | tag1\|tag2           | action\|sci-fi\|fantasy      |
+| `volumes`           | ❌ Não       | Number               | 28                           |
+| `chapters`          | ❌ Não       | Number               | 500                          |
+| `author`            | ✅ Sim       | String               | Reki Kawahara                |
+| `format`            | ✅ Sim       | String               | light_novel / web_novel      |
+| `publisher`         | ❌ Não       | String               | ASCII Media Works            |
+| `external_metadata` | ❌ Não       | source:id\|source:id | mal:21479\|anilist:21479     |
 
 ### 🎬 Movie
 **Endpoint:** `POST /api/items/import/movie`
@@ -87,7 +109,7 @@ curl -X POST http://localhost:8080/api/items/import/manga -F "file=@manga.csv"
 | `publisher`         | ❌ Não       | String               | Bandai Namco               |
 | `external_metadata` | ❌ Não       | source:id\|source:id | igdb:119133\|steam:1245620 |
 
-### 📚 Book
+### 📘 Book (Traditional Books)
 **Endpoint:** `POST /api/items/import/book`
 
 | Campo               | Obrigatório | Formato              | Exemplo                            |
@@ -102,21 +124,6 @@ curl -X POST http://localhost:8080/api/items/import/manga -F "file=@manga.csv"
 | `publisher`         | ❌ Não       | String               | George Allen & Unwin               |
 | `external_metadata` | ❌ Não       | source:id\|source:id | isbn:9780547928227\|goodreads:5907 |
 
-### 🎵 Music
-**Endpoint:** `POST /api/items/import/music`
-
-| Campo               | Obrigatório | Formato              | Exemplo                                    |
-| ------------------- | ----------- | -------------------- | ------------------------------------------ |
-| `title`             | ✅ Sim       | String               | Bohemian Rhapsody                          |
-| `description`       | ❌ Não       | String               | Iconic rock opera...                       |
-| `release_date`      | ❌ Não       | YYYY-MM-DD           | 1975-10-31                                 |
-| `cover_url`         | ❌ Não       | URL                  | https://...                                |
-| `tags`              | ❌ Não       | tag1\|tag2           | rock\|classic                              |
-| `artist`            | ✅ Sim       | String               | Queen                                      |
-| `duration`          | ✅ Sim       | Number (seconds)     | 354                                        |
-| `album`             | ❌ Não       | String               | A Night at the Opera                       |
-| `external_metadata` | ❌ Não       | source:id\|source:id | spotify:4u7Ene...\|musicbrainz:b1a9c0e9... |
-
 ## 📌 Notas Importantes
 
 ### External Metadata
@@ -124,11 +131,10 @@ curl -X POST http://localhost:8080/api/items/import/manga -F "file=@manga.csv"
 Formato: `source:id|source:id` (ex: `mal:123|anilist:456`)
 
 **Sources comuns:**
-- Anime/Manga: `mal`, `anilist`, `kitsu`
+- Anime/Comic/Novel: `mal`, `anilist`, `kitsu`
 - Movies/Series: `imdb`, `tmdb`
 - Games: `igdb`, `steam`, `gog`
 - Books: `isbn`, `goodreads`
-- Music: `spotify`, `musicbrainz`
 
 ### Tags
 Separadas por `|` (ex: `action|adventure|fantasy`). Criadas automaticamente se não existirem.

@@ -61,22 +61,15 @@ func ItemToDTO(item *models.Item) *ItemDTO {
 				AveragePlaytime: item.GameData.AveragePlaytime,
 			}
 		}
-	case models.MediaTypeBook, models.MediaTypeManga, models.MediaTypeLightNovel:
+	case models.MediaTypeBook, models.MediaTypeComic, models.MediaTypeNovel:
 		if item.BookData != nil {
 			dto.SpecificData = &BookDataDTO{
-				Author:   item.BookData.Author,
-				Volumes:  item.BookData.Volumes,
-				Chapters: item.BookData.Chapters,
-				Pages:    item.BookData.Pages,
-			}
-		}
-	case models.MediaTypeMusic:
-		if item.MusicData != nil {
-			dto.SpecificData = &MusicDataDTO{
-				Artist:   item.MusicData.Artist,
-				Album:    item.MusicData.Album,
-				Duration: item.MusicData.Duration,
-				Tracks:   item.MusicData.Tracks,
+				Author:    item.BookData.Author,
+				Volumes:   item.BookData.Volumes,
+				Chapters:  item.BookData.Chapters,
+				Pages:     item.BookData.Pages,
+				Format:    item.BookData.Format,
+				Publisher: item.BookData.Publisher,
 			}
 		}
 	}

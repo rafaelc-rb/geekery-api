@@ -82,13 +82,7 @@ func (r *ItemRepository) preloadSpecificData(ctx context.Context, item *models.I
 		if err == nil {
 			item.GameData = &gameData
 		}
-	case models.MediaTypeMusic:
-		var musicData models.MusicData
-		err := r.db.WithContext(ctx).Where("item_id = ?", item.ID).First(&musicData).Error
-		if err == nil {
-			item.MusicData = &musicData
-		}
-	case models.MediaTypeBook:
+	case models.MediaTypeBook, models.MediaTypeComic, models.MediaTypeNovel:
 		var bookData models.BookData
 		err := r.db.WithContext(ctx).Where("item_id = ?", item.ID).First(&bookData).Error
 		if err == nil {
@@ -99,12 +93,6 @@ func (r *ItemRepository) preloadSpecificData(ctx context.Context, item *models.I
 		err := r.db.WithContext(ctx).Where("item_id = ?", item.ID).First(&seriesData).Error
 		if err == nil {
 			item.SeriesData = &seriesData
-		}
-	case models.MediaTypeManga, models.MediaTypeLightNovel:
-		var bookData models.BookData
-		err := r.db.WithContext(ctx).Where("item_id = ?", item.ID).First(&bookData).Error
-		if err == nil {
-			item.BookData = &bookData
 		}
 	}
 
@@ -136,9 +124,7 @@ func (r *ItemRepository) GetByType(ctx context.Context, mediaType models.MediaTy
 		query = query.Preload("MovieData")
 	case models.MediaTypeGame:
 		query = query.Preload("GameData")
-	case models.MediaTypeMusic:
-		query = query.Preload("MusicData")
-	case models.MediaTypeBook, models.MediaTypeManga, models.MediaTypeLightNovel:
+	case models.MediaTypeBook, models.MediaTypeComic, models.MediaTypeNovel:
 		query = query.Preload("BookData")
 	case models.MediaTypeSeries:
 		query = query.Preload("SeriesData")
@@ -262,12 +248,7 @@ func (r *ItemRepository) CreateSpecificData(ctx context.Context, itemID uint, me
 			gameData.ItemID = itemID
 			return r.db.WithContext(ctx).Create(gameData).Error
 		}
-	case models.MediaTypeMusic:
-		if musicData, ok := data.(*models.MusicData); ok {
-			musicData.ItemID = itemID
-			return r.db.WithContext(ctx).Create(musicData).Error
-		}
-	case models.MediaTypeBook:
+	case models.MediaTypeBook, models.MediaTypeComic, models.MediaTypeNovel:
 		if bookData, ok := data.(*models.BookData); ok {
 			bookData.ItemID = itemID
 			return r.db.WithContext(ctx).Create(bookData).Error

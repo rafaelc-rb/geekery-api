@@ -169,7 +169,7 @@ func TestUserItem_GetProgressPercent_Reading(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			item := &Item{
 				ID:   1,
-				Type: MediaTypeManga,
+				Type: MediaTypeComic,
 				BookData: &BookData{
 					Chapters: tt.chapters,
 					Volumes:  tt.volumes,

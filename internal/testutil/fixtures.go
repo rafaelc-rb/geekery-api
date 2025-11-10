@@ -13,8 +13,7 @@ var ItemFixtures = struct {
 	SeriesItem models.Item
 	GameItem   models.Item
 	BookItem   models.Item
-	MangaItem  models.Item
-	MusicItem  models.Item
+	ComicItem  models.Item
 }{
 	AnimeItem: models.Item{
 		Title:       "Attack on Titan",
@@ -46,17 +45,11 @@ var ItemFixtures = struct {
 		Description: "Dystopian masterpiece",
 		CoverURL:    "https://example.com/1984.jpg",
 	},
-	MangaItem: models.Item{
+	ComicItem: models.Item{
 		Title:       "One Piece",
-		Type:        models.MediaTypeManga,
+		Type:        models.MediaTypeComic,
 		Description: "Pirate adventure",
 		CoverURL:    "https://example.com/onepiece.jpg",
-	},
-	MusicItem: models.Item{
-		Title:       "Dark Side of the Moon",
-		Type:        models.MediaTypeMusic,
-		Description: "Pink Floyd album",
-		CoverURL:    "https://example.com/dsotm.jpg",
 	},
 }
 

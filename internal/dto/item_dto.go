@@ -65,18 +65,12 @@ type GameDataDTO struct {
 	AveragePlaytime int    `json:"average_playtime"`
 }
 
-// BookDataDTO representa dados específicos de livro/manga/LN
+// BookDataDTO representa dados específicos de livro/comic/novel
 type BookDataDTO struct {
-	Author   string `json:"author"`
-	Volumes  int    `json:"volumes"`
-	Chapters int    `json:"chapters"`
-	Pages    int    `json:"pages"`
-}
-
-// MusicDataDTO representa dados específicos de música
-type MusicDataDTO struct {
-	Artist   string `json:"artist"`
-	Album    string `json:"album"`
-	Duration int    `json:"duration"` // em segundos
-	Tracks   int    `json:"tracks"`
+	Author    string `json:"author"`
+	Volumes   int    `json:"volumes"`
+	Chapters  int    `json:"chapters"`
+	Pages     int    `json:"pages"`
+	Format    string `json:"format,omitempty"`
+	Publisher string `json:"publisher,omitempty"`
 }

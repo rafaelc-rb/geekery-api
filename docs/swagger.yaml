@@ -128,6 +128,9 @@ definitions:
         type: string
       deleted_at:
         $ref: '#/definitions/gorm.DeletedAt'
+      format:
+        description: 'Subtipo: manga, manhwa, light_novel, web_novel, etc'
+        type: string
       id:
         type: integer
       item_id:
@@ -136,10 +139,13 @@ definitions:
       pages:
         description: Total de páginas
         type: integer
+      publisher:
+        description: Editora/publisher
+        type: string
       updated_at:
         type: string
       volumes:
-        description: Total de volumes (manga/LN sempre tem, books às vezes)
+        description: Total de volumes (comic/novel sempre tem, books às vezes)
         type: integer
     type: object
   github_com_rafaelc-rb_geekery-api_internal_models.GameData:
@@ -191,8 +197,6 @@ definitions:
         type: integer
       movie_data:
         $ref: '#/definitions/github_com_rafaelc-rb_geekery-api_internal_models.MovieData'
-      music_data:
-        $ref: '#/definitions/github_com_rafaelc-rb_geekery-api_internal_models.MusicData'
       release_date:
         description: Data de lançamento/estreia
         type: string
@@ -244,9 +248,8 @@ definitions:
     - movie
     - series
     - game
-    - manga
-    - light_novel
-    - music
+    - comic
+    - novel
     - book
     type: string
     x-enum-varnames:
@@ -254,9 +257,8 @@ definitions:
     - MediaTypeMovie
     - MediaTypeSeries
     - MediaTypeGame
-    - MediaTypeManga
-    - MediaTypeLightNovel
-    - MediaTypeMusic
+    - MediaTypeComic
+    - MediaTypeNovel
     - MediaTypeBook
   github_com_rafaelc-rb_geekery-api_internal_models.MovieData:
     properties:
@@ -273,30 +275,6 @@ definitions:
         type: integer
       runtime:
         description: em minutos
-        type: integer
-      updated_at:
-        type: string
-    type: object
-  github_com_rafaelc-rb_geekery-api_internal_models.MusicData:
-    properties:
-      album:
-        type: string
-      artist:
-        type: string
-      created_at:
-        type: string
-      deleted_at:
-        $ref: '#/definitions/gorm.DeletedAt'
-      duration:
-        description: Duração total do álbum em segundos
-        type: integer
-      id:
-        type: integer
-      item_id:
-        description: FK para items
-        type: integer
-      tracks:
-        description: Número de faixas
         type: integer
       updated_at:
         type: string
@@ -450,7 +428,7 @@ info:
     email: support@geekery.dev
     name: Rafael C Ribeiro
   description: |-
-    A personal geek media tracker API - Track anime, movies, series, games, manga, books and music
+    A personal geek media tracker API - Track anime, movies, series, games, comics, novels, and books
     Features: Personal lists, progress tracking, ratings, favorites, and more
   license:
     name: MIT
@@ -765,6 +743,33 @@ paths:
       summary: Import book items
       tags:
       - items
+  /items/import/comic:
+    post:
+      consumes:
+      - multipart/form-data
+      description: Import multiple comic items from CSV file
+      parameters:
+      - description: CSV file with comic data
+        in: formData
+        name: file
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Import completed
+          schema:
+            $ref: '#/definitions/github_com_rafaelc-rb_geekery-api_internal_dto.ImportResult'
+        "400":
+          description: Bad request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Import comic items
+      tags:
+      - items
   /items/import/game:
     post:
       consumes:
@@ -790,33 +795,6 @@ paths:
               type: string
             type: object
       summary: Import game items
-      tags:
-      - items
-  /items/import/manga:
-    post:
-      consumes:
-      - multipart/form-data
-      description: Import multiple manga items from CSV file
-      parameters:
-      - description: CSV file with manga data
-        in: formData
-        name: file
-        required: true
-        type: file
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: Import completed
-          schema:
-            $ref: '#/definitions/github_com_rafaelc-rb_geekery-api_internal_dto.ImportResult'
-        "400":
-          description: Bad request
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-      summary: Import manga items
       tags:
       - items
   /items/import/movie:
@@ -846,13 +824,13 @@ paths:
       summary: Import movie items
       tags:
       - items
-  /items/import/music:
+  /items/import/novel:
     post:
       consumes:
       - multipart/form-data
-      description: Import multiple music items from CSV file
+      description: Import multiple novel items from CSV file
       parameters:
-      - description: CSV file with music data
+      - description: CSV file with novel data
         in: formData
         name: file
         required: true
@@ -870,7 +848,7 @@ paths:
             additionalProperties:
               type: string
             type: object
-      summary: Import music items
+      summary: Import novel items
       tags:
       - items
   /items/import/series:

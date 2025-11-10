@@ -65,7 +65,6 @@ func runMigrations(db *gorm.DB) error {
 		&models.AnimeData{},
 		&models.MovieData{},
 		&models.GameData{},
-		&models.MusicData{},
 		&models.BookData{},
 		&models.SeriesData{},
 	)

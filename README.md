@@ -4,7 +4,7 @@
 
 **Your Personal Geek Media Tracker**
 
-A modern REST API for tracking and organizing geek media content (anime, movies, series, games, manga, light novels, music, books).
+A modern REST API for tracking and organizing geek media content (anime, movies, series, games, comics, novels, and books).
 
 [![Go Version](https://img.shields.io/badge/Go-1.23-00ADD8?logo=go)](https://go.dev/)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)

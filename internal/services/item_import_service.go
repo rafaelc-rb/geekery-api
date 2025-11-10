@@ -172,18 +172,18 @@ func getRequiredHeadersForType(mediaType models.MediaType) []string {
 	switch mediaType {
 	case models.MediaTypeAnime:
 		return append(common, "episodes", "studio")
-	case models.MediaTypeManga:
-		return append(common, "chapters", "author")
+	case models.MediaTypeComic:
+		return append(common, "chapters", "author", "format")
 	case models.MediaTypeMovie:
 		return append(common, "runtime", "director")
 	case models.MediaTypeSeries:
 		return append(common, "seasons", "episodes")
 	case models.MediaTypeGame:
 		return append(common, "platform", "developer")
-	case models.MediaTypeBook, models.MediaTypeLightNovel:
+	case models.MediaTypeBook:
 		return append(common, "pages", "author")
-	case models.MediaTypeMusic:
-		return append(common, "artist", "duration")
+	case models.MediaTypeNovel:
+		return append(common, "author", "format")
 	default:
 		return common
 	}
@@ -237,18 +237,18 @@ func (s *ItemService) parseCSVRecordByType(headers, record []string, mediaType m
 	switch mediaType {
 	case models.MediaTypeAnime:
 		specificData, err = parseAnimeData(headers, record)
-	case models.MediaTypeManga:
-		specificData, err = parseMangaData(headers, record)
+	case models.MediaTypeComic:
+		specificData, err = parseComicData(headers, record)
 	case models.MediaTypeMovie:
 		specificData, err = parseMovieData(headers, record)
 	case models.MediaTypeSeries:
 		specificData, err = parseSeriesData(headers, record)
 	case models.MediaTypeGame:
 		specificData, err = parseGameData(headers, record)
-	case models.MediaTypeBook, models.MediaTypeLightNovel:
+	case models.MediaTypeBook:
 		specificData, err = parseBookData(headers, record)
-	case models.MediaTypeMusic:
-		specificData, err = parseMusicData(headers, record)
+	case models.MediaTypeNovel:
+		specificData, err = parseNovelData(headers, record)
 	}
 
 	if err != nil {
@@ -310,9 +310,11 @@ func parseAnimeData(headers, record []string) (*models.AnimeData, error) {
 	return data, nil
 }
 
-func parseMangaData(headers, record []string) (*models.BookData, error) {
+func parseComicData(headers, record []string) (*models.BookData, error) {
 	data := &models.BookData{
-		Author: getFieldValue(headers, record, "author"),
+		Author:    getFieldValue(headers, record, "author"),
+		Format:    getFieldValue(headers, record, "format"),
+		Publisher: getFieldValue(headers, record, "publisher"),
 	}
 
 	if chaptersStr := getFieldValue(headers, record, "chapters"); chaptersStr != "" {
@@ -337,6 +339,14 @@ func parseMangaData(headers, record []string) (*models.BookData, error) {
 			return nil, fmt.Errorf("volumes cannot be negative: %d", volumes)
 		}
 		data.Volumes = volumes
+	}
+
+	if data.Author == "" {
+		return nil, errors.New("author is required")
+	}
+
+	if data.Format == "" {
+		return nil, errors.New("format is required for comics")
 	}
 
 	return data, nil
@@ -416,8 +426,8 @@ func parseGameData(headers, record []string) (*models.GameData, error) {
 
 func parseBookData(headers, record []string) (*models.BookData, error) {
 	data := &models.BookData{
-		Author: getFieldValue(headers, record, "author"),
-		// Note: publisher field exists in CSV but not in model, so we skip it
+		Author:    getFieldValue(headers, record, "author"),
+		Publisher: getFieldValue(headers, record, "publisher"),
 	}
 
 	if pagesStr := getFieldValue(headers, record, "pages"); pagesStr != "" {
@@ -440,27 +450,41 @@ func parseBookData(headers, record []string) (*models.BookData, error) {
 	return data, nil
 }
 
-func parseMusicData(headers, record []string) (*models.MusicData, error) {
-	data := &models.MusicData{
-		Artist: getFieldValue(headers, record, "artist"),
-		Album:  getFieldValue(headers, record, "album"),
+func parseNovelData(headers, record []string) (*models.BookData, error) {
+	data := &models.BookData{
+		Author:    getFieldValue(headers, record, "author"),
+		Format:    getFieldValue(headers, record, "format"),
+		Publisher: getFieldValue(headers, record, "publisher"),
 	}
 
-	if durationStr := getFieldValue(headers, record, "duration"); durationStr != "" {
-		duration, err := strconv.Atoi(durationStr)
+	if volumesStr := getFieldValue(headers, record, "volumes"); volumesStr != "" {
+		volumes, err := strconv.Atoi(volumesStr)
 		if err != nil {
-			return nil, fmt.Errorf("invalid duration value: %s", durationStr)
+			return nil, fmt.Errorf("invalid volumes value: %s", volumesStr)
 		}
-		if duration <= 0 {
-			return nil, fmt.Errorf("duration must be positive: %d", duration)
+		if volumes < 0 {
+			return nil, fmt.Errorf("volumes cannot be negative: %d", volumes)
 		}
-		data.Duration = duration
-	} else {
-		return nil, errors.New("duration is required")
+		data.Volumes = volumes
 	}
 
-	if data.Artist == "" {
-		return nil, errors.New("artist is required")
+	if chaptersStr := getFieldValue(headers, record, "chapters"); chaptersStr != "" {
+		chapters, err := strconv.Atoi(chaptersStr)
+		if err != nil {
+			return nil, fmt.Errorf("invalid chapters value: %s", chaptersStr)
+		}
+		if chapters < 0 {
+			return nil, fmt.Errorf("chapters cannot be negative: %d", chapters)
+		}
+		data.Chapters = chapters
+	}
+
+	if data.Author == "" {
+		return nil, errors.New("author is required")
+	}
+
+	if data.Format == "" {
+		return nil, errors.New("format is required for novels")
 	}
 
 	return data, nil

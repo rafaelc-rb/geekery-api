@@ -19,7 +19,7 @@ import (
 
 // @title           Geekery API
 // @version         1.0
-// @description     A personal geek media tracker API - Track anime, movies, series, games, manga, books and music
+// @description     A personal geek media tracker API - Track anime, movies, series, games, comics, novels, and books
 // @description     Features: Personal lists, progress tracking, ratings, favorites, and more
 // @termsOfService  http://swagger.io/terms/
 

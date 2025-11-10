@@ -47,7 +47,7 @@ type Item struct {
 	UpdatedAt   time.Time      `json:"updated_at"`
 	DeletedAt   gorm.DeletedAt `json:"deleted_at,omitempty" gorm:"index"`
 	Title       string         `json:"title" gorm:"not null;index"`
-	Type        MediaType      `json:"type" gorm:"type:varchar(50);not null;index;check:type IN ('anime','movie','series','game','manga','light_novel','music','book')"`
+	Type        MediaType      `json:"type" gorm:"type:varchar(50);not null;index;check:type IN ('anime','movie','series','game','comic','novel','book')"`
 	Description string         `json:"description" gorm:"type:text"`
 	ReleaseDate *time.Time     `json:"release_date" gorm:"index"` // Data de lançamento/estreia
 	CoverURL    string         `json:"cover_url"`
@@ -58,7 +58,6 @@ type Item struct {
 	AnimeData  *AnimeData  `json:"anime_data,omitempty" gorm:"foreignKey:ItemID;constraint:OnDelete:CASCADE"`
 	MovieData  *MovieData  `json:"movie_data,omitempty" gorm:"foreignKey:ItemID;constraint:OnDelete:CASCADE"`
 	GameData   *GameData   `json:"game_data,omitempty" gorm:"foreignKey:ItemID;constraint:OnDelete:CASCADE"`
-	MusicData  *MusicData  `json:"music_data,omitempty" gorm:"foreignKey:ItemID;constraint:OnDelete:CASCADE"`
 	BookData   *BookData   `json:"book_data,omitempty" gorm:"foreignKey:ItemID;constraint:OnDelete:CASCADE"`
 	SeriesData *SeriesData `json:"series_data,omitempty" gorm:"foreignKey:ItemID;constraint:OnDelete:CASCADE"`
 }

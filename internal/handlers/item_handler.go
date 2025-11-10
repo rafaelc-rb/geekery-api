@@ -248,18 +248,32 @@ func (h *ItemHandler) ImportAnime(c *gin.Context) {
 	h.importByType(c, models.MediaTypeAnime)
 }
 
-// ImportManga importa múltiplos mangas de um arquivo CSV
-// @Summary      Import manga items
-// @Description  Import multiple manga items from CSV file
+// ImportComic importa múltiplos comics (manga, manhwa) de um arquivo CSV
+// @Summary      Import comic items
+// @Description  Import multiple comic items from CSV file
 // @Tags         items
 // @Accept       multipart/form-data
 // @Produce      json
-// @Param        file  formData  file  true  "CSV file with manga data"
+// @Param        file  formData  file  true  "CSV file with comic data"
 // @Success      200  {object}  dto.ImportResult  "Import completed"
 // @Failure      400  {object}  map[string]string  "Bad request"
-// @Router       /items/import/manga [post]
-func (h *ItemHandler) ImportManga(c *gin.Context) {
-	h.importByType(c, models.MediaTypeManga)
+// @Router       /items/import/comic [post]
+func (h *ItemHandler) ImportComic(c *gin.Context) {
+	h.importByType(c, models.MediaTypeComic)
+}
+
+// ImportNovel importa múltiplos novels (light novel, web novel) de um arquivo CSV
+// @Summary      Import novel items
+// @Description  Import multiple novel items from CSV file
+// @Tags         items
+// @Accept       multipart/form-data
+// @Produce      json
+// @Param        file  formData  file  true  "CSV file with novel data"
+// @Success      200  {object}  dto.ImportResult  "Import completed"
+// @Failure      400  {object}  map[string]string  "Bad request"
+// @Router       /items/import/novel [post]
+func (h *ItemHandler) ImportNovel(c *gin.Context) {
+	h.importByType(c, models.MediaTypeNovel)
 }
 
 // ImportMovie importa múltiplos filmes de um arquivo CSV
@@ -316,20 +330,6 @@ func (h *ItemHandler) ImportGame(c *gin.Context) {
 // @Router       /items/import/book [post]
 func (h *ItemHandler) ImportBook(c *gin.Context) {
 	h.importByType(c, models.MediaTypeBook)
-}
-
-// ImportMusic importa múltiplas músicas de um arquivo CSV
-// @Summary      Import music items
-// @Description  Import multiple music items from CSV file
-// @Tags         items
-// @Accept       multipart/form-data
-// @Produce      json
-// @Param        file  formData  file  true  "CSV file with music data"
-// @Success      200  {object}  dto.ImportResult  "Import completed"
-// @Failure      400  {object}  map[string]string  "Bad request"
-// @Router       /items/import/music [post]
-func (h *ItemHandler) ImportMusic(c *gin.Context) {
-	h.importByType(c, models.MediaTypeMusic)
 }
 
 // importByType é o handler genérico de import por tipo
